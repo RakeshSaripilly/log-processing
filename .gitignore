@@ -8,3 +8,5 @@ storage/raw/
 benchmarks/data/
 *.ulpf
 *.duckdb
+*.md
+*venv
