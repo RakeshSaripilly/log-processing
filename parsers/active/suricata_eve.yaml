@@ -1,0 +1,25 @@
+name: Suricata EVE IDS
+vendor: OISF
+product: Suricata
+version: "7.0"
+class_uid: 2001
+category_uid: 2
+detection:
+  contains:
+    - '"event_type"'
+    - '"src_ip"'
+decoders:
+  - json
+mappings:
+  src_ip: src_endpoint.ip
+  src_port: src_endpoint.port
+  dest_ip: dst_endpoint.ip
+  dest_port: dst_endpoint.port
+  proto: connection_info.protocol_name
+  event_type: activity_name
+labels:
+  - ids
+  - suricata
+  - security_finding
+fixtures:
+  - raw: '{"timestamp":"2026-09-26T12:00:00.123456+0000","event_type":"alert","src_ip":"192.0.2.14","src_port":53211,"dest_ip":"198.51.100.4","dest_port":80,"proto":"TCP","alert":{"action":"allowed","signature":"ET SCAN Potential SSH Scan"}}'

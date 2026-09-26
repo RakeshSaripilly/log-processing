@@ -1,0 +1,28 @@
+name: Linux OpenSSH Auth
+vendor: Linux
+product: OpenSSH
+version: "1.0"
+class_uid: 3001
+category_uid: 3
+detection:
+  contains:
+    - "sshd"
+  patterns:
+    - "sshd\\[\\d+\\]: (Accepted|Failed) (password|publickey)"
+decoders:
+  - regex
+  - syslog_rfc3164
+regex_pattern: 'sshd\[(?P<pid>\d+)\]:\s+(?P<action>Accepted|Failed)\s+(?P<auth_method>\w+)\s+for\s+(?P<username>[^\s]+)\s+from\s+(?P<src_ip>\d+\.\d+\.\d+\.\d+)\s+port\s+(?P<src_port>\d+)'
+mappings:
+  username: actor.user.name
+  src_ip: src_endpoint.ip
+  src_port: src_endpoint.port
+  action: activity_name
+labels:
+  - auth
+  - ssh
+  - linux
+fixtures:
+  - raw: "Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.168.1.105 port 54322 ssh2"
+    expected_user: root
+    expected_ip: "192.168.1.105"

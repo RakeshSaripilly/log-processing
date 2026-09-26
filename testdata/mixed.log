@@ -1,0 +1,25 @@
+# SYNTHETIC TESTDATA FOR SIH26156 ULPF BENCHMARKING (RFC5737 RESERVED IP TEST SUITE)
+# LABELED SYNTHETIC: All IP addresses conform to RFC 5737 (192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24) and RFC 1918.
+# 1. Linux SSHD Auth
+Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2
+Oct 12 10:14:25 web-01 sshd[12446]: Failed password for invalid user admin from 198.51.100.44 port 43121 ssh2
+# 2. Cisco ASA Firewall
+%ASA-6-302013: Built outbound TCP connection 99812 for outside:198.51.100.22/443 to inside:192.0.2.80/51234
+%ASA-4-106023: Deny tcp src outside:203.0.113.55/49152 dst inside:192.0.2.99/80 by access-group "acl_outside"
+# 3. Suricata EVE JSON IDS
+{"timestamp":"2026-09-26T12:00:00.123456+0000","event_type":"alert","src_ip":"192.0.2.14","src_port":53211,"dest_ip":"198.51.100.4","dest_port":80,"proto":"TCP","alert":{"action":"allowed","signature":"ET SCAN Potential SSH Scan"}}
+{"timestamp":"2026-09-26T12:00:02.789123+0000","event_type":"flow","src_ip":"198.51.100.99","src_port":443,"dest_ip":"203.0.113.12","dest_port":52110,"proto":"TCP","app_proto":"tls"}
+# 4. Palo Alto PAN-OS Traffic CSV
+1,2026/09/26 12:00:00,001234567890,TRAFFIC,drop,1,2026/09/26 12:00:00,203.0.113.19,198.51.100.5,0.0.0.0,0.0.0.0,rule-block-all,,,ping,vsys1,untrust,trust,ethernet1/1,,Syslog-Palo,2026/09/26 12:00:00,12345,1,12345,80,0,0,0x0,icmp,deny,60,60,0,1,2026/09/26 12:00:00,0,any,0,123456789,0x0,192.0.2.0-192.0.2.255,198.51.100.0-198.51.100.255,0,1,0
+# 5. AWS VPC Flow Space-Delimited
+2 123456789012 eni-0123456789abcdef0 198.51.100.12 203.0.113.88 49152 443 6 20 4200 1695730000 1695730060 ACCEPT OK
+# 6. Fortinet FortiGate Key-Value
+date=2026-09-26 time=12:30:00 devname="FG-CORP-01" devid="FG100E4Q17000123" type=traffic subtype=forward level=notice srcip=192.0.2.55 srcport=54312 dstip=198.51.100.25 dstport=443 proto=6 action=accept policyid=12
+# 7. RFC 5424 Standard Syslog
+<165>1 2026-09-26T22:14:15.003Z edge-firewall.corp.net myproc 1245 ID47 [exampleSDID@32473 iut="3" eventSource="Application"] Connection established with remote peer 203.0.113.91
+# 8. Windows Security Event Log XML
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event"><System><Provider Name="Microsoft-Windows-Security-Auditing"/><EventID>4624</EventID></System><EventData><Data Name="TargetUserName">Administrator</Data><Data Name="WorkstationName">WORKSTATION-01</Data><Data Name="IpAddress">192.0.2.50</Data><Data Name="IpPort">49152</Data></EventData></Event>
+# 9. Clean JSON
+{"level":"info","msg":"clean json test","user":"analyst1","src_ip":"192.0.2.77"}
+# 10. Unknown / Unmapped Proprietary Log for Telemetry Vector Matcher & HITL Demo
+VENDOR-X|9921|CRIT|disk_array_2|temp=88C|status=degrading

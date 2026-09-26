@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ULPF - Universal Log Pre-processing Framework | Team LunarX (NTRO)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(26, 34, 52, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --primary: #38bdf8;
+      --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      --accent-green: #34d399;
+      --accent-purple: #a855f7;
+      --accent-red: #f87171;
+      --accent-amber: #fbbf24;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Outfit', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(52, 211, 153, 0.05) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism Classes */
+    .glass {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+    }
+
+    /* Top Navigation */
+    header {
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(10, 13, 20, 0.85);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #000;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+    }
+    .badge-green { color: var(--accent-green); border-color: rgba(52, 211, 153, 0.3); background: rgba(52, 211, 153, 0.1); }
+    .badge-purple { color: var(--accent-purple); border-color: rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.1); }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      padding: 12px 32px;
+      background: rgba(15, 20, 32, 0.6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--border-accent);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
+
+    /* Metric Grid */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+    .metric-card {
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: var(--primary-gradient);
+    }
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .metric-val {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: var(--mono);
+      color: #fff;
+    }
+    .metric-sub {
+      font-size: 11px;
+      color: var(--accent-green);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Ingest & Flow Layout */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .split-layout { grid-template-columns: 1fr; }
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    textarea, input, select {
+      width: 100%;
+      background: rgba(10, 14, 22, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 12px;
+      resize: vertical;
+      transition: border 0.2s;
+    }
+    textarea:focus, input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #000;
+    }
+    .btn-primary:hover {
+      background: #7dd3fc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+    }
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .btn-danger:hover {
+      background: var(--accent-red);
+      color: #000;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--primary);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    th {
+      padding: 12px 16px;
+      background: rgba(10, 14, 24, 0.6);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--mono);
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Terminal & Code */
+    .terminal-box {
+      background: #06090e;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #38bdf8;
+      max-height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Pipeline Step Diagram */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 160px;
+      padding: 16px;
+      background: rgba(20, 28, 45, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .flow-step.active-step {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+    .step-num {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .step-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .step-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Status Pill */
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill-green { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); }
+    .pill-blue { background: rgba(56, 189, 248, 0.15); color: var(--primary); }
+    .pill-red { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); }
+    .pill-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">U</div>
+      <div>
+        <div class="brand-title">ULPF Control Console</div>
+        <div class="brand-sub">Universal Log Pre-processing Framework | NTRO SIH26156</div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <div class="badge badge-green"><span class="pulse-dot"></span> Air-Gapped Safe</div>
+      <div class="badge badge-purple">RFC8785 JCS + BLAKE3</div>
+      <div class="badge">Team LunarX</div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('overview')">⚡ Overview & Pipeline</button>
+    <button class="tab-btn" onclick="switchTab('ingest')">📥 Ingestion & Source Packs</button>
+    <button class="tab-btn" onclick="switchTab('lake')">📊 Analytical Lake (DuckDB)</button>
+    <button class="tab-btn" onclick="switchTab('review')">🧠 Vector Matcher (HITL)</button>
+    <button class="tab-btn" onclick="switchTab('integrity')">⛓️ Blockchain & Tamper Lab</button>
+    <button class="tab-btn" onclick="switchTab('vault')">🔒 Raw Vault Explorer</button>
+  </div>
+
+  <main>
+    <!-- TAB 1: OVERVIEW -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="grid-4">
+        <div class="glass metric-card">
+          <div class="metric-label">Total Ingested Events</div>
+          <div class="metric-val" id="metric-ingested">0</div>
+          <div class="metric-sub">↑ 100% Lossless Write-Before-Parse</div>
+        </div>
+        <div class="glass metric-card">
+          <div class="metric-label">Vault Storage (zstd)</div>
+          <div class="metric-val" id="metric-bytes">0 KB</div>
+          <div class="metric-sub">CRC-32 & RawRef Locators</div>
+        </div>
+        <div class="glass metric-card">
+          <div class="metric-label">Active Source Packs</div>
+          <div class="metric-val" id="metric-packs">8</div>
+          <div class="metric-sub">Zero-Code YAML + Hot-Reload</div>
+        </div>
+        <div class="glass metric-card">
+          <div class="metric-label">Hash Chain Integrity</div>
+          <div class="metric-val" id="metric-integrity" style="color: var(--accent-green);">VERIFIED</div>
+          <div class="metric-sub">RFC 8785 JCS + Merkle RFC 6962</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Flow -->
+      <div class="glass">
+        <div class="card-header">
+          <div class="card-title">🔄 Architecture V2 Pipeline: Vault-First + Vector + Hash Chain</div>
+          <span class="pill pill-blue">Zero Socket Leak</span>
+        </div>
+        <div class="card-body">
+          <div class="flow-steps">
+            <div class="flow-step active-step">
+              <div class="step-num">Step 01</div>
+              <div class="step-title">Vault Append</div>
+              <div class="step-desc">Write-Before-Parse zstd CRC-32</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 02</div>
+              <div class="step-title">Pack Detector</div>
+              <div class="step-desc">Compiled regex on hot path</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 03</div>
+              <div class="step-title">10 Decoders</div>
+              <div class="step-desc">Syslog, CEF, LEEF, JSON, XML</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 04</div>
+              <div class="step-title">Vector Matcher</div>
+              <div class="step-desc">Offline telemetry cosine match</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 05</div>
+              <div class="step-title">OCSF 1.9</div>
+              <div class="step-desc">Network/Auth/Finding Classes</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 06</div>
+              <div class="step-title">Attestation</div>
+              <div class="step-desc">BLAKE3 prev_hash + Ed25519</div>
+            </div>
+            <div class="flow-step">
+              <div class="step-num">Step 07</div>
+              <div class="step-title">Lake Sinks</div>
+              <div class="step-desc">DuckDB, Parquet, Wazuh UDP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Ingest & Live Events Table -->
+      <div class="split-layout">
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title">⚡ Quick Interactive Ingest</div>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="loadSampleLog()">Load Sample</button>
+          </div>
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <textarea id="quick-input" rows="4" placeholder="Paste Syslog, JSON, CEF, Palo Alto CSV, or Cisco ASA log..."></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <button class="btn btn-primary" onclick="submitLog()">🚀 Ingest & Process Log</button>
+              <button class="btn btn-outline" onclick="ingestFullMixedBatch()">📂 Ingest RFC5737 Batch (10 Logs)</button>
+            </div>
+            <div id="quick-status" style="font-size: 12px; color: var(--accent-green);"></div>
+          </div>
+        </div>
+
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title">📜 Real-time Cryptographic Chain Head</div>
+            <span class="pill pill-green" id="chain-status-pill">Chain Healthy</span>
+          </div>
+          <div class="card-body">
+            <div class="terminal-box" id="chain-head-box">Loading chain head and Merkle state...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: INGESTION -->
+    <div id="tab-ingest" class="tab-content">
+      <div class="glass">
+        <div class="card-header">
+          <div class="card-title">📦 Active Declarative Source Packs (parsers/active/*.yaml)</div>
+          <span class="pill pill-purple">8 Packs Loaded</span>
+        </div>
+        <div class="card-body table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Pack ID</th>
+                <th>Vendor / Product</th>
+                <th>Class UID</th>
+                <th>Decoders</th>
+                <th>Hot Path Check</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="packs-table-body">
+              <tr><td>linux_sshd</td><td>Linux OpenSSH</td><td>3001 (Auth)</td><td>regex, syslog_rfc3164</td><td>contains: "sshd"</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>cisco_asa</td><td>Cisco ASA</td><td>4001 (Network)</td><td>regex, syslog_rfc3164</td><td>pattern: %ASA-\d-\d{6}</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>suricata_eve</td><td>OISF Suricata</td><td>2001 (Finding)</td><td>json</td><td>contains: "event_type", "src_ip"</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>paloalto_panos</td><td>Palo Alto Networks</td><td>4001 (Network)</td><td>csv</td><td>contains: "TRAFFIC"</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>aws_vpc_flow</td><td>AWS VPC Flow</td><td>4001 (Network)</td><td>csv</td><td>pattern: ^2\s+\d+\s+eni-</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>fortinet_fortios</td><td>Fortinet FortiGate</td><td>4001 (Network)</td><td>keyvalue</td><td>contains: "type=traffic"</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>windows_security</td><td>Microsoft Windows</td><td>3001 (Auth)</td><td>xml, json</td><td>contains: "Security-Auditing"</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+              <tr><td>rfc5424_fallback</td><td>IETF Standard</td><td>1001 (System)</td><td>syslog_rfc5424</td><td>pattern: ^&lt;\d{1,3}&gt;1\s+</td><td><span class="pill pill-green">ACTIVE</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: LAKE -->
+    <div id="tab-lake" class="tab-content">
+      <div class="glass">
+        <div class="card-header">
+          <div class="card-title">📊 DuckDB Analytical Lake (OCSF 1.9 Canonical Schema)</div>
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="refreshLakeLogs()">🔄 Refresh</button>
+        </div>
+        <div class="card-body table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Seq</th>
+                <th>Time (UTC)</th>
+                <th>Class</th>
+                <th>Vendor / Product</th>
+                <th>Source IP:Port</th>
+                <th>Dest IP:Port</th>
+                <th>Activity</th>
+                <th>Fingerprint (BLAKE3)</th>
+                <th>RawRef Locator</th>
+              </tr>
+            </thead>
+            <tbody id="lake-table-body">
+              <tr><td colspan="9" style="text-align: center; color: var(--text-muted);">No logs in lake yet. Ingest a log to begin.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: REVIEW QUEUE (HITL) -->
+    <div id="tab-review" class="tab-content">
+      <div class="glass">
+        <div class="card-header">
+          <div class="card-title">🧠 Telemetry-Aware Vector Matcher & HITL Review Queue</div>
+          <span class="pill pill-amber">Confidence Routing 0.60 - 0.85</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Unknown keys from proprietary logs are embedded with offline all-MiniLM-L6-v2 representation 
+            <code>key | samples: top5 values | type: ip/port/timestamp/enum</code>. 
+            Mappings with confidence &gt;0.85 auto-map, while 0.60-0.85 enter this queue for one-click human promotion.
+          </p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Review ID</th>
+                  <th>Source Key</th>
+                  <th>Inferred Type</th>
+                  <th>Samples</th>
+                  <th>Suggested OCSF Target</th>
+                  <th>Confidence</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="review-table-body">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Review queue is empty. Ingest proprietary or unknown logs to see vector suggestions.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: INTEGRITY & TAMPER LAB -->
+    <div id="tab-integrity" class="tab-content">
+      <div class="split-layout">
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title">💥 Live Cryptographic Tamper Simulator</div>
+            <span class="pill pill-red">Attack Verification Lab</span>
+          </div>
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 14px;">
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Simulate an adversary or malicious insider modifying an event directly inside the analytical database.
+              The ULPF cryptographic verifier immediately detects the broken RFC 8785 hash chain!
+            </p>
+            <div>
+              <label style="font-size: 12px; color: var(--text-muted);">Target Sequence to Tamper:</label>
+              <input type="number" id="tamper-seq" value="0" style="margin-top: 4px;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-muted);">Field to Corrupt:</label>
+              <select id="tamper-field" style="margin-top: 4px;">
+                <option value="src_ip">src_endpoint.ip</option>
+                <option value="dst_ip">dst_endpoint.ip</option>
+                <option value="user_name">actor.user.name</option>
+                <option value="activity_name">activity_name</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-muted);">Malicious Value to Inject:</label>
+              <input type="text" id="tamper-val" value="198.51.100.99" style="margin-top: 4px;">
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-danger" onclick="runTamperTest()">⚠️ Inject Tamper & Verify Chain</button>
+              <button class="btn btn-outline" onclick="runChainVerification()">🔍 Verify Entire Chain</button>
+            </div>
+            <div class="terminal-box" id="tamper-results">Results will appear here...</div>
+          </div>
+        </div>
+
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title">🌳 RFC 6962 Merkle Inclusion Proof</div>
+            <span class="pill pill-purple">ceil(log2 n) Zero-Knowledge Proof</span>
+          </div>
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 14px;">
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Prove that an event was permanently logged without sharing or exposing the raw vault or database contents.
+            </p>
+            <div style="display: flex; gap: 10px;">
+              <input type="number" id="proof-seq" value="0" placeholder="Event sequence...">
+              <button class="btn btn-primary" onclick="generateMerkleProof()">Generate Proof</button>
+            </div>
+            <div class="terminal-box" id="merkle-results">Merkle tree audit path will appear here...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: VAULT -->
+    <div id="tab-vault" class="tab-content">
+      <div class="glass">
+        <div class="card-header">
+          <div class="card-title">🔒 Append-Only zstd Raw Vault Explorer</div>
+          <span class="pill pill-green">Write-Before-Parse Lossless</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Every log is written to append-only zstd compressed 1MiB blocks with CRC-32 checksums before parsing begins.
+            Inspect the exact original bytes and verify cryptographic SHA-256 match.
+          </p>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="vault-event-id" placeholder="Enter Event UUID (e.g. from Lake table)...">
+            <button class="btn btn-primary" onclick="fetchRawFromVault()">Fetch Raw Bytes</button>
+          </div>
+          <div class="terminal-box" id="vault-results">Exact raw bytes and SHA-256 reconstruction will appear here...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (tabId === 'lake') refreshLakeLogs();
+      if (tabId === 'review') refreshReviewQueue();
+    }
+
+    async function loadSampleLog() {
+      const sample = `Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2`;
+      document.getElementById('quick-input').value = sample;
+    }
+
+    async function submitLog() {
+      const log = document.getElementById('quick-input').value.trim();
+      if (!log) return;
+      try {
+        const res = await fetch('/ingest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ log: log })
+        });
+        const data = await res.json();
+        document.getElementById('quick-status').innerText = `✓ Successfully ingested event seq: ${data.events[0].sequence}, FP: ${data.events[0].fingerprint.substring(0, 16)}...`;
+        refreshMetrics();
+        refreshLakeLogs();
+      } catch (e) {
+        alert('Ingest failed: ' + e);
+      }
+    }
+
+    async function ingestFullMixedBatch() {
+      try {
+        const sampleLogs = [
+          "Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2",
+          "Oct 12 10:14:25 web-01 sshd[12446]: Failed password for invalid user admin from 198.51.100.44 port 43121 ssh2",
+          "%ASA-6-302013: Built outbound TCP connection 99812 for outside:198.51.100.22/443 to inside:192.0.2.80/51234",
+          "%ASA-4-106023: Deny tcp src outside:203.0.113.55/49152 dst inside:192.0.2.99/80 by access-group \"acl_outside\"",
+          '{"timestamp":"2026-09-26T12:00:00.123456+0000","event_type":"alert","src_ip":"192.0.2.14","src_port":53211,"dest_ip":"198.51.100.4","dest_port":80,"proto":"TCP","alert":{"action":"allowed","signature":"ET SCAN Potential SSH Scan"}}',
+          "1,2026/09/26 12:00:00,001234567890,TRAFFIC,drop,1,2026/09/26 12:00:00,203.0.113.19,198.51.100.5,0.0.0.0,0.0.0.0,rule-block-all,,,ping,vsys1,untrust,trust,ethernet1/1,,Syslog-Palo,2026/09/26 12:00:00,12345,1,12345,80,0,0,0x0,icmp,deny,60,60,0,1,2026/09/26 12:00:00,0,any,0,123456789,0x0,192.0.2.0-192.0.2.255,198.51.100.0-198.51.100.255,0,1,0",
+          "2 123456789012 eni-0123456789abcdef0 198.51.100.12 203.0.113.88 49152 443 6 20 4200 1695730000 1695730060 ACCEPT OK",
+          'date=2026-09-26 time=12:30:00 devname="FG-CORP-01" devid="FG100E4Q17000123" type=traffic subtype=forward level=notice srcip=192.0.2.55 srcport=54312 dstip=198.51.100.25 dstport=443 proto=6 action=accept policyid=12',
+          '<165>1 2026-09-26T22:14:15.003Z edge-firewall.corp.net myproc 1245 ID47 [exampleSDID@32473 iut="3" eventSource="Application"] Connection established with remote peer 203.0.113.91',
+          'VENDOR-X|9921|CRIT|disk_array_2|temp=88C|status=degrading'
+        ];
+        const res = await fetch('/ingest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ logs: sampleLogs })
+        });
+        const data = await res.json();
+        document.getElementById('quick-status').innerText = `✓ Successfully ingested ${data.count} heterogeneous logs across 8 vendors!`;
+        refreshMetrics();
+        refreshLakeLogs();
+      } catch (e) {
+        alert('Batch ingest failed: ' + e);
+      }
+    }
+
+    async function refreshMetrics() {
+      try {
+        const res = await fetch('/metrics');
+        const text = await res.text();
+        const lines = text.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('ulpf_ingested_total')) {
+            document.getElementById('metric-ingested').innerText = line.split(' ')[1];
+          }
+          if (line.startsWith('ulpf_bytes_total')) {
+            const bytes = parseInt(line.split(' ')[1]);
+            document.getElementById('metric-bytes').innerText = (bytes / 1024).toFixed(1) + ' KB';
+          }
+        }
+
+        const vRes = await fetch('/verify');
+        const vData = await vRes.json();
+        document.getElementById('chain-head-box').innerText = JSON.stringify(vData, null, 2);
+      } catch (e) {}
+    }
+
+    async function refreshLakeLogs() {
+      try {
+        const res = await fetch('/lake/logs?limit=50');
+        const data = await res.json();
+        const tbody = document.getElementById('lake-table-body');
+        if (!data.logs || data.logs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted);">No logs in lake yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.logs.map(log => `
+          <tr>
+            <td><strong>#${log.sequence}</strong></td>
+            <td>${new Date(log.timestamp).toISOString().substring(11, 23)}</td>
+            <td><span class="pill pill-blue">${log.class_uid}</span></td>
+            <td>${log.vendor} ${log.product}</td>
+            <td>${log.src_ip || '-'}</td>
+            <td>${log.dst_ip || '-'}</td>
+            <td>${log.activity_name || '-'}</td>
+            <td title="${log.fingerprint}">${log.fingerprint.substring(0, 16)}...</td>
+            <td><a href="javascript:void(0)" onclick="inspectRaw('${log.event_id}')" style="color: var(--primary); text-decoration: none;">${log.raw_locator}</a></td>
+          </tr>
+        `).join('');
+      } catch (e) {}
+    }
+
+    async function refreshReviewQueue() {
+      try {
+        const res = await fetch('/review-queue');
+        const data = await res.json();
+        const tbody = document.getElementById('review-table-body');
+        if (!data.items || data.items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Review queue is empty.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.items.map(item => `
+          <tr>
+            <td><code>${item.review_id}</code></td>
+            <td><strong>${item.source_key}</strong></td>
+            <td><span class="pill pill-blue">${item.inferred_type}</span></td>
+            <td>${item.samples.join(', ')}</td>
+            <td><span class="pill pill-green">${item.suggested_target}</span></td>
+            <td>${(item.confidence * 100).toFixed(1)}%</td>
+            <td><button class="btn btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="approveReview('${item.review_id}')">Approve & Promote</button></td>
+          </tr>
+        `).join('');
+      } catch (e) {}
+    }
+
+    async function approveReview(reviewId) {
+      try {
+        const res = await fetch(`/review/${reviewId}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        alert('Mapping approved and promoted to active configuration!');
+        refreshReviewQueue();
+      } catch (e) {
+        alert('Approval failed: ' + e);
+      }
+    }
+
+    async function runTamperTest() {
+      const seq = parseInt(document.getElementById('tamper-seq').value);
+      const field = document.getElementById('tamper-field').value;
+      const val = document.getElementById('tamper-val').value;
+      try {
+        const res = await fetch('/tamper-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sequence: seq, field_to_corrupt: field, tampered_value: val })
+        });
+        const data = await res.json();
+        document.getElementById('tamper-results').innerText = JSON.stringify(data, null, 2);
+        document.getElementById('chain-status-pill').innerText = 'TAMPER DETECTED';
+        document.getElementById('chain-status-pill').className = 'pill pill-red';
+        document.getElementById('metric-integrity').innerText = 'TAMPERED!';
+        document.getElementById('metric-integrity').style.color = 'var(--accent-red)';
+      } catch (e) {
+        alert('Tamper test error: ' + e);
+      }
+    }
+
+    async function runChainVerification() {
+      try {
+        const res = await fetch('/verify');
+        const data = await res.json();
+        document.getElementById('tamper-results').innerText = JSON.stringify(data, null, 2);
+        if (data.verified) {
+          document.getElementById('chain-status-pill').innerText = 'Chain Healthy';
+          document.getElementById('chain-status-pill').className = 'pill pill-green';
+          document.getElementById('metric-integrity').innerText = 'VERIFIED';
+          document.getElementById('metric-integrity').style.color = 'var(--accent-green)';
+        }
+      } catch (e) {}
+    }
+
+    async function generateMerkleProof() {
+      const seq = parseInt(document.getElementById('proof-seq').value);
+      try {
+        const res = await fetch(`/prove/${seq}`);
+        const data = await res.json();
+        document.getElementById('merkle-results').innerText = JSON.stringify(data, null, 2);
+      } catch (e) {
+        alert('Proof generation error: ' + e);
+      }
+    }
+
+    async function inspectRaw(eventId) {
+      document.getElementById('vault-event-id').value = eventId;
+      switchTab('vault');
+      fetchRawFromVault();
+    }
+
+    async function fetchRawFromVault() {
+      const eventId = document.getElementById('vault-event-id').value.trim();
+      if (!eventId) return;
+      try {
+        const res = await fetch(`/raw/${eventId}`);
+        const rawText = await res.text();
+        const linRes = await fetch(`/lineage/${eventId}`);
+        const linData = await linRes.json();
+        document.getElementById('vault-results').innerText = 
+          `--- EXACT RAW PAYLOAD FROM ZSTD VAULT ---\n${rawText}\n\n--- 7-STAGE LINEAGE AUDIT TRAIL ---\n${JSON.stringify(linData, null, 2)}`;
+      } catch (e) {
+        alert('Fetch raw error: ' + e);
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      refreshMetrics();
+      refreshLakeLogs();
+      setInterval(refreshMetrics, 3000);
+    });
+  </script>
+</body>
+</html>

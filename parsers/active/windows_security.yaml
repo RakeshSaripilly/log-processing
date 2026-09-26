@@ -1,0 +1,23 @@
+name: Windows Security Event
+vendor: Microsoft
+product: Windows
+version: "10/11/Server"
+class_uid: 3001
+category_uid: 3
+detection:
+  contains:
+    - "Microsoft-Windows-Security-Auditing"
+decoders:
+  - xml
+  - json
+mappings:
+  TargetUserName: actor.user.name
+  WorkstationName: device.hostname
+  IpAddress: src_endpoint.ip
+  IpPort: src_endpoint.port
+labels:
+  - windows
+  - security
+  - auth
+fixtures:
+  - raw: '<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event"><System><Provider Name="Microsoft-Windows-Security-Auditing"/><EventID>4624</EventID></System><EventData><Data Name="TargetUserName">Administrator</Data><Data Name="WorkstationName">WORKSTATION-01</Data><Data Name="IpAddress">192.168.1.50</Data><Data Name="IpPort">49152</Data></EventData></Event>'

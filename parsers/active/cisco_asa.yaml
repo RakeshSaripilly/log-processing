@@ -1,0 +1,29 @@
+name: Cisco ASA Firewall
+vendor: Cisco
+product: ASA
+version: "9.16"
+class_uid: 4001
+category_uid: 4
+detection:
+  contains:
+    - "%ASA-"
+  patterns:
+    - "%ASA-\\d-\\d{6}:"
+decoders:
+  - regex
+  - syslog_rfc3164
+regex_pattern: '%ASA-(?P<severity>\d)-(?P<message_id>\d{6}):\s+(?P<action>Built|Teardown)\s+(?P<direction>\w+)\s+(?P<protocol>TCP|UDP|ICMP)\s+connection\s+\d+\s+for\s+(?P<src_interface>[^:]+):(?P<src_ip>\d+\.\d+\.\d+\.\d+)/(?P<src_port>\d+)\s+to\s+(?P<dst_interface>[^:]+):(?P<dst_ip>\d+\.\d+\.\d+\.\d+)/(?P<dst_port>\d+)'
+mappings:
+  src_ip: src_endpoint.ip
+  src_port: src_endpoint.port
+  dst_ip: dst_endpoint.ip
+  dst_port: dst_endpoint.port
+  action: activity_name
+labels:
+  - firewall
+  - cisco
+  - network
+fixtures:
+  - raw: "%ASA-6-302013: Built outbound TCP connection 99812 for outside:198.51.100.22/443 to inside:10.0.0.15/51234"
+    expected_src_ip: "198.51.100.22"
+    expected_dst_ip: "10.0.0.15"

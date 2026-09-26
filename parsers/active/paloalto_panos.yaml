@@ -1,0 +1,26 @@
+name: Palo Alto PAN-OS Traffic
+vendor: Palo Alto Networks
+product: PAN-OS
+version: "10.2"
+class_uid: 4001
+category_uid: 4
+detection:
+  contains:
+    - "TRAFFIC"
+  patterns:
+    - "^1,\\d{4}/\\d{2}/\\d{2}\\s+\\d{2}:\\d{2}:\\d{2},\\d+,TRAFFIC,"
+decoders:
+  - csv
+mappings:
+  col_7: src_endpoint.ip
+  col_8: dst_endpoint.ip
+  col_24: src_endpoint.port
+  col_25: dst_endpoint.port
+  col_29: connection_info.protocol_name
+  col_30: activity_name
+labels:
+  - firewall
+  - paloalto
+  - panos
+fixtures:
+  - raw: "1,2026/09/26 12:00:00,001234567890,TRAFFIC,drop,1,2026/09/26 12:00:00,203.0.113.19,198.51.100.5,0.0.0.0,0.0.0.0,rule-block-all,,,ping,vsys1,untrust,trust,ethernet1/1,,Syslog-Palo,2026/09/26 12:00:00,12345,1,12345,80,0,0,0x0,icmp,deny,60,60,0,1,2026/09/26 12:00:00,0,any,0,123456789,0x0,192.168.0.0-192.168.255.255,10.0.0.0-10.255.255.255,0,1,0"

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  ulpf-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ulpf-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/app/storage
+      - ./lake:/app/lake
+      - ./parsers/active:/app/parsers/active
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ULPF_LAKE_PATH=/app/lake
+      - ULPF_VAULT_PATH=/app/storage/raw
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ulpf-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ulpf-collector
+    command: python collector/tailer.py
+    ports:
+      - "5140:5140/udp"
+    volumes:
+      - ./storage:/app/storage
+      - ./lake:/app/lake
+      - ./testdata:/app/testdata
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - ulpf-api
+    restart: unless-stopped
