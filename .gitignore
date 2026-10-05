@@ -45,7 +45,7 @@ output/raw/
 output/lake/
 output/normalized.json
 output/metadata.json
-
+output/*
 # IDEs & OS Files
 .vscode/
 .idea/
