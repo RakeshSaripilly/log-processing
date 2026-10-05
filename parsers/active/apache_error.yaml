@@ -1,0 +1,23 @@
+name: Apache Error Log
+vendor: Apache
+product: HTTP Server
+version: "2.4"
+class_uid: 1001
+category_uid: 1
+detection:
+  patterns:
+    - '^\[[A-Za-z]{3}\s+[A-Za-z]{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4}\]\s+\[(notice|error|warn|crit|alert|emerg|info|debug)\]'
+decoders:
+  - regex
+regex_pattern: '^\[(?P<timestamp>[A-Za-z]{3}\s+[A-Za-z]{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4})\]\s+\[(?P<severity>[^\]]+)\]\s+(?:\[client\s+(?P<src_ip>[^\]]+)\]\s+)?(?P<message>.*)'
+mappings:
+  src_ip: src_endpoint.ip
+  severity: severity
+  message: message
+labels:
+  - web
+  - apache
+  - error_log
+fixtures:
+  - raw: '[Thu Jun 09 07:11:21 2005] [error] [client 204.100.200.22] Directory index forbidden by rule: /var/www/html/'
+    expected_ip: "204.100.200.22"

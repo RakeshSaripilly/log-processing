@@ -45,12 +45,15 @@ class LakeStorageEngine:
     Unified Storage Engine for ULPF.
     Writes partitioned Parquet, NDJSON, and syncs to DuckDB for sub-second analytical queries.
     """
-    def __init__(self, lake_dir: str = "./lake"):
+    def __init__(self, lake_dir: str = "./lake", batch_size: int = 1000):
         self.lake_dir = Path(lake_dir)
         self.lake_dir.mkdir(parents=True, exist_ok=True)
         self.ndjson_dir = self.lake_dir / "ndjson"
         self.parquet_dir = self.lake_dir / "parquet"
         self.duckdb_path = self.lake_dir / "ulpf.duckdb"
+        self.batch_size = batch_size
+        self._buffer: List[Dict[str, Any]] = []
+        self._lineage_buffer: List[Dict[str, Any]] = []
         
         self.ndjson_dir.mkdir(parents=True, exist_ok=True)
         self.parquet_dir.mkdir(parents=True, exist_ok=True)
@@ -120,59 +123,26 @@ class LakeStorageEngine:
 
     def commit_event(self, ocsf_event: Dict[str, Any], lineage: Optional[Dict[str, Any]] = None):
         """
-        Atomically commit normalized OCSF event to NDJSON, DuckDB, and Parquet.
+        Commit normalized OCSF event using memory buffer with high-throughput batch flushing.
         """
-        now = datetime.datetime.now(datetime.timezone.utc)
-        event_id = str(ocsf_event.get("event_id", ocsf_event.get("unmapped", {}).get("raw_sha256", "")))
-        seq = int(ocsf_event.get("sequence", 0))
-        ts = int(ocsf_event.get("time", int(now.timestamp() * 1000)))
-        class_uid = int(ocsf_event.get("class_uid", 0))
-        category_uid = int(ocsf_event.get("category_uid", 0))
-        prod_meta = ocsf_event.get("metadata", {}).get("product", {})
-        vendor = str(prod_meta.get("vendor_name", "Generic"))
-        product = str(prod_meta.get("name", "Unknown"))
-        activity = str(ocsf_event.get("activity_name", ""))
-
-        src_ep = ocsf_event.get("src_endpoint", {})
-        src_ip = str(src_ep.get("ip", "")) if src_ep else ""
-        src_port = int(src_ep.get("port", 0)) if src_ep and src_ep.get("port") else None
-
-        dst_ep = ocsf_event.get("dst_endpoint", {})
-        dst_ip = str(dst_ep.get("ip", "")) if dst_ep else ""
-        dst_port = int(dst_ep.get("port", 0)) if dst_ep and dst_ep.get("port") else None
-
-        actor = ocsf_event.get("actor", {})
-        user_name = str(actor.get("user", {}).get("name", "")) if actor else ""
-
-        dev = ocsf_event.get("device", {})
-        hostname = str(dev.get("hostname", "")) if dev else ""
-
-        fp = str(ocsf_event.get("fingerprint", ""))
-        prev_hash = str(ocsf_event.get("prev_hash", ""))
-        raw_loc = str(ocsf_event.get("unmapped", {}).get("ulpf_raw_locator", ""))
-        raw_text = str(ocsf_event.get("raw_data", ""))
-        ocsf_json_str = json.dumps(ocsf_event)
-
-        # 1. Append to NDJSON
-        part_ndjson = self._get_partition_path(self.ndjson_dir, now)
-        ndjson_file = part_ndjson / "events.jsonl"
-        with open(ndjson_file, "a", encoding="utf-8") as f:
-            f.write(ocsf_json_str + "\n")
-
-        # 2. Upsert into DuckDB
-        self.con.execute("""
-            INSERT OR REPLACE INTO parsed_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, [
-            event_id, seq, ts, class_uid, category_uid, vendor, product, activity,
-            src_ip, src_port, dst_ip, dst_port, user_name, hostname,
-            fp, prev_hash, raw_loc, raw_text, ocsf_json_str
-        ])
-
-        # 3. Store lineage record
+        self._buffer.append(ocsf_event)
         if lineage:
-            self.con.execute("""
-                INSERT OR REPLACE INTO lineage_log VALUES (?, ?)
-            """, [event_id, json.dumps(lineage)])
+            self._lineage_buffer.append(lineage)
+
+        if len(self._buffer) >= self.batch_size:
+            self.flush()
+
+    def flush(self):
+        """
+        Flush all buffered events to DuckDB and NDJSON atomically in a single vectorized transaction.
+        """
+        if not self._buffer:
+            return
+        batch = self._buffer
+        lins = self._lineage_buffer
+        self._buffer = []
+        self._lineage_buffer = []
+        self.commit_batch(batch, lineages=lins)
 
     def commit_batch(self, events: List[Dict[str, Any]], lineages: Optional[List[Dict[str, Any]]] = None):
         """
@@ -234,7 +204,17 @@ class LakeStorageEngine:
             "prev_hash", "raw_locator", "raw_payload", "ocsf_json"
         ]
         df = pd.DataFrame(rows, columns=cols)
-        self.con.append("parsed_logs", df)
+        self.con.register("_batch_df", df)
+        self.con.execute("INSERT OR REPLACE INTO parsed_logs SELECT * FROM _batch_df")
+        self.con.unregister("_batch_df")
+
+        if lineages:
+            lin_rows = [(l.get("event_id", ""), json.dumps(l)) for l in lineages if isinstance(l, dict) and "event_id" in l]
+            if lin_rows:
+                lin_df = pd.DataFrame(lin_rows, columns=["event_id", "lineage_json"])
+                self.con.register("_lin_df", lin_df)
+                self.con.execute("INSERT OR REPLACE INTO lineage_log SELECT * FROM _lin_df")
+                self.con.unregister("_lin_df")
 
     def flush_parquet(self):
         """
@@ -247,6 +227,10 @@ class LakeStorageEngine:
         return str(pq_path)
 
     def close(self):
+        try:
+            self.flush()
+        except Exception:
+            pass
         try:
             self.con.close()
         except Exception:

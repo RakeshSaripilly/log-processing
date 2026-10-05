@@ -324,7 +324,8 @@ def execute_process(args: argparse.Namespace) -> int:
     events_rejected = 0
     vendor_hint = args.source or detected_source
 
-    for idx, line in enumerate(valid_lines):
+    total_valid = len(valid_lines)
+    for idx, line in enumerate(valid_lines, 1):
         try:
             ev = pipeline.process_raw(line, vendor_hint=vendor_hint)
             events.append(ev)
@@ -333,11 +334,18 @@ def execute_process(args: argparse.Namespace) -> int:
             if verbose:
                 sys.stderr.write(f"Warning: Parser/normalizer error on line {idx}: {e}\n")
 
+        if not json_mode and total_valid > 500 and (idx % 2000 == 0 or idx == total_valid):
+            sys.stdout.write(f"\r[3/7] Parsing events....................... {idx:,}/{total_valid:,} ({(idx/total_valid)*100:.0f}%)")
+            sys.stdout.flush()
+
     events_parsed = len(events)
     events_normalized = sum(1 for ev in events if ev.get("class_uid", 0) > 0 or "metadata" in ev)
 
     if not json_mode:
-        print("[3/7] Parsing events....................... OK")
+        if total_valid > 500:
+            sys.stdout.write(f"\r[3/7] Parsing events....................... OK ({total_valid:,} events)\n")
+        else:
+            print("[3/7] Parsing events....................... OK")
         print("[4/7] Normalizing to OCSF.................. OK")
 
     # Stage 5: Validating events
@@ -363,6 +371,7 @@ def execute_process(args: argparse.Namespace) -> int:
     # Stage 6: Preserving raw evidence (flush and verify retrieval)
     try:
         pipeline.vault.flush()
+        pipeline.lake.flush()
         raw_preservation_passed = True
         traceability_passed = True
 
