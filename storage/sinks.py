@@ -6,6 +6,11 @@ Team LunarX - SIH26156 (NTRO)
 
 import os
 import json
+try:
+    import orjson
+    _HAS_ORJSON = True
+except ImportError:
+    _HAS_ORJSON = False
 import socket
 import datetime
 from pathlib import Path
@@ -40,6 +45,16 @@ OCSF_ARROW_SCHEMA = pa.schema([
 ])
 
 
+_ACTIVE_LAKES = []
+
+def _flush_active_lakes():
+    for lake in list(_ACTIVE_LAKES):
+        try:
+            lake.flush()
+        except Exception:
+            pass
+
+
 class LakeStorageEngine:
     """
     Unified Storage Engine for ULPF.
@@ -54,6 +69,7 @@ class LakeStorageEngine:
         self.batch_size = batch_size
         self._buffer: List[Dict[str, Any]] = []
         self._lineage_buffer: List[Dict[str, Any]] = []
+        _ACTIVE_LAKES.append(self)
         
         self.ndjson_dir.mkdir(parents=True, exist_ok=True)
         self.parquet_dir.mkdir(parents=True, exist_ok=True)
@@ -62,6 +78,8 @@ class LakeStorageEngine:
 
     def _init_duckdb(self):
         self.con = duckdb.connect(str(self.duckdb_path))
+        self.con.execute("PRAGMA disable_progress_bar")
+        self.con.execute("PRAGMA wal_autocheckpoint = '1GB'")
         self.con.execute("""
             CREATE TABLE IF NOT EXISTS parsed_logs (
                 event_id VARCHAR PRIMARY KEY,
@@ -157,35 +175,49 @@ class LakeStorageEngine:
         rows = []
         ndjson_lines = []
         for ev in events:
-            event_id = str(ev.get("event_id", ev.get("unmapped", {}).get("raw_sha256", "")))
+            event_id = str(ev.get("event_id") or ev.get("unmapped", {}).get("raw_sha256", ""))
             seq = int(ev.get("sequence", 0))
             ts = int(ev.get("time", int(now.timestamp() * 1000)))
             class_uid = int(ev.get("class_uid", 0))
             category_uid = int(ev.get("category_uid", 0))
-            prod_meta = ev.get("metadata", {}).get("product", {})
-            vendor = str(prod_meta.get("vendor_name", "Generic"))
-            product = str(prod_meta.get("name", "Unknown"))
+            meta = ev.get("metadata")
+            prod_meta = meta.get("product") if meta else None
+            if prod_meta:
+                vendor = str(prod_meta.get("vendor_name", "Generic"))
+                product = str(prod_meta.get("name", "Unknown"))
+            else:
+                vendor = "Generic"
+                product = "Unknown"
             activity = str(ev.get("activity_name", ""))
 
-            src_ep = ev.get("src_endpoint", {})
-            src_ip = str(src_ep.get("ip", "")) if src_ep else ""
-            src_port = int(src_ep.get("port", 0)) if src_ep and src_ep.get("port") else None
+            src_ep = ev.get("src_endpoint")
+            if src_ep:
+                src_ip = str(src_ep.get("ip", ""))
+                src_port = src_ep.get("port")
+            else:
+                src_ip = ""
+                src_port = None
 
-            dst_ep = ev.get("dst_endpoint", {})
-            dst_ip = str(dst_ep.get("ip", "")) if dst_ep else ""
-            dst_port = int(dst_ep.get("port", 0)) if dst_ep and dst_ep.get("port") else None
+            dst_ep = ev.get("dst_endpoint")
+            if dst_ep:
+                dst_ip = str(dst_ep.get("ip", ""))
+                dst_port = dst_ep.get("port")
+            else:
+                dst_ip = ""
+                dst_port = None
 
-            actor = ev.get("actor", {})
+            actor = ev.get("actor")
             user_name = str(actor.get("user", {}).get("name", "")) if actor else ""
 
-            dev = ev.get("device", {})
+            dev = ev.get("device")
             hostname = str(dev.get("hostname", "")) if dev else ""
 
             fp = str(ev.get("fingerprint", ""))
             prev_hash = str(ev.get("prev_hash", ""))
-            raw_loc = str(ev.get("unmapped", {}).get("ulpf_raw_locator", ""))
+            unmapped = ev.get("unmapped")
+            raw_loc = str(unmapped.get("ulpf_raw_locator", "")) if unmapped else ""
             raw_text = str(ev.get("raw_data", ""))
-            ocsf_json_str = json.dumps(ev)
+            ocsf_json_str = orjson.dumps(ev).decode('utf-8') if _HAS_ORJSON else json.dumps(ev)
 
             ndjson_lines.append(ocsf_json_str)
             rows.append((
@@ -205,16 +237,19 @@ class LakeStorageEngine:
         ]
         df = pd.DataFrame(rows, columns=cols)
         self.con.register("_batch_df", df)
+        self.con.execute("BEGIN TRANSACTION")
         self.con.execute("INSERT OR REPLACE INTO parsed_logs SELECT * FROM _batch_df")
         self.con.unregister("_batch_df")
 
         if lineages:
-            lin_rows = [(l.get("event_id", ""), json.dumps(l)) for l in lineages if isinstance(l, dict) and "event_id" in l]
+            lin_dumps = (lambda l: orjson.dumps(l).decode('utf-8')) if _HAS_ORJSON else json.dumps
+            lin_rows = [(l.get("event_id", ""), lin_dumps(l)) for l in lineages if isinstance(l, dict) and "event_id" in l]
             if lin_rows:
                 lin_df = pd.DataFrame(lin_rows, columns=["event_id", "lineage_json"])
                 self.con.register("_lin_df", lin_df)
                 self.con.execute("INSERT OR REPLACE INTO lineage_log SELECT * FROM _lin_df")
                 self.con.unregister("_lin_df")
+        self.con.execute("COMMIT")
 
     def flush_parquet(self):
         """
@@ -231,6 +266,11 @@ class LakeStorageEngine:
             self.flush()
         except Exception:
             pass
+        if self in _ACTIVE_LAKES:
+            try:
+                _ACTIVE_LAKES.remove(self)
+            except Exception:
+                pass
         try:
             self.con.close()
         except Exception:

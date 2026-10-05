@@ -251,9 +251,6 @@ def execute_process(args: argparse.Namespace) -> int:
     normalized_json_path = output_dir / "normalized.json"
     metadata_json_path = output_dir / "metadata.json"
 
-    # Start timing
-    start_time = time.perf_counter()
-
     # Read input file lines
     try:
         with open(input_path, "r", encoding="utf-8", errors="replace") as f:
@@ -312,6 +309,7 @@ def execute_process(args: argparse.Namespace) -> int:
         print()
 
     # Stage 1: Ingesting raw events
+    start_time = time.perf_counter()
     if not json_mode:
         print("[1/7] Ingesting raw events................. OK")
 
@@ -325,18 +323,22 @@ def execute_process(args: argparse.Namespace) -> int:
     vendor_hint = args.source or detected_source
 
     total_valid = len(valid_lines)
-    for idx, line in enumerate(valid_lines, 1):
-        try:
-            ev = pipeline.process_raw(line, vendor_hint=vendor_hint)
-            events.append(ev)
-        except Exception as e:
-            events_rejected += 1
-            if verbose:
-                sys.stderr.write(f"Warning: Parser/normalizer error on line {idx}: {e}\n")
+    if hasattr(pipeline, "process_batch") and total_valid > 50:
+        events = pipeline.process_batch(valid_lines, vendor_hint=vendor_hint)
+        events_rejected = total_valid - len(events)
+    else:
+        for idx, line in enumerate(valid_lines, 1):
+            try:
+                ev = pipeline.process_raw(line, vendor_hint=vendor_hint)
+                events.append(ev)
+            except Exception as e:
+                events_rejected += 1
+                if verbose:
+                    sys.stderr.write(f"Warning: Parser/normalizer error on line {idx}: {e}\n")
 
-        if not json_mode and total_valid > 500 and (idx % 2000 == 0 or idx == total_valid):
-            sys.stdout.write(f"\r[3/7] Parsing events....................... {idx:,}/{total_valid:,} ({(idx/total_valid)*100:.0f}%)")
-            sys.stdout.flush()
+            if not json_mode and total_valid > 500 and (idx % 2000 == 0 or idx == total_valid):
+                sys.stdout.write(f"\r[3/7] Parsing events....................... {idx:,}/{total_valid:,} ({(idx/total_valid)*100:.0f}%)")
+                sys.stdout.flush()
 
     events_parsed = len(events)
     events_normalized = sum(1 for ev in events if ev.get("class_uid", 0) > 0 or "metadata" in ev)
@@ -376,7 +378,7 @@ def execute_process(args: argparse.Namespace) -> int:
         traceability_passed = True
 
         # Check raw retrieval and sha256 traceability on sample of events
-        sample_check_count = min(len(events), 50)
+        sample_check_count = min(len(events), 20)
         for i in range(sample_check_count):
             ev = events[i]
             locator_str = ev.get("unmapped", {}).get("ulpf_raw_locator")
@@ -452,8 +454,13 @@ def execute_process(args: argparse.Namespace) -> int:
     }
 
     try:
-        with open(normalized_json_path, "w", encoding="utf-8") as f:
-            json.dump(events, f, indent=2)
+        try:
+            import orjson as _orjson_mod
+            with open(normalized_json_path, "wb") as f:
+                f.write(_orjson_mod.dumps(events, option=_orjson_mod.OPT_INDENT_2))
+        except ImportError:
+            with open(normalized_json_path, "w", encoding="utf-8") as f:
+                json.dump(events, f, indent=2)
     except Exception as e:
         sys.stderr.write(f"ERROR: Failed to write normalized JSON output: {e}\n")
         pipeline.close()

@@ -20,6 +20,12 @@ try:
 except ImportError:
     HAS_ZSTD = False
 
+try:
+    import ulpf_core_rs
+    HAS_RUST_CORE = True
+except ImportError:
+    HAS_RUST_CORE = False
+
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
@@ -96,6 +102,7 @@ class VaultStorage:
         
         # Buffer for accumulating logs into ~1MB blocks
         self.buffer = bytearray()
+        self.buffer_lines: List[bytes] = []
         self.buffer_pending_locators: List[RawRef] = []
 
         self.current_segment_id = 0
@@ -191,6 +198,7 @@ class VaultStorage:
             offset = len(self.buffer)
             length = len(raw_bytes)
             self.buffer.extend(raw_bytes)
+            self.buffer_lines.append(raw_bytes)
 
             ref = RawRef(
                 segment_id=self.current_segment_id,
@@ -206,10 +214,73 @@ class VaultStorage:
 
         return ref
 
+    def write_raw_batch(self, raw_lines: List[bytes]) -> List[RawRef]:
+        """
+        Batch Write-Before-Parse accelerated by Rust core ulpf_core_rs.
+        Falls back to sequential write_raw if Rust core is not available.
+        """
+        if not HAS_RUST_CORE or self.cipher_key:
+            return [self.write_raw(line) for line in raw_lines]
+
+        with self.lock:
+            if self.buffer:
+                self._flush_locked()
+
+            blocks, loc_strs, crcs = ulpf_core_rs.vault_append_batch(
+                raw_lines,
+                self.current_segment_id,
+                self.current_block_idx
+            )
+
+            for block_payload, block_crc in zip(blocks, crcs):
+                payload_bytes = bytes(block_payload)
+                comp_len = len(payload_bytes)
+                flags = FLAG_COMPRESSION_ZSTD
+
+                seg_path = self._get_segment_path(self.current_segment_id)
+                if seg_path.exists() and seg_path.stat().st_size + HEADER_SIZE + comp_len > self.max_segment_size:
+                    self.current_segment_id += 1
+                    self.current_block_idx = 0
+                    seg_path = self._get_segment_path(self.current_segment_id)
+
+                header = struct.pack(
+                    HEADER_FORMAT,
+                    MAGIC_HEADER,
+                    self.current_segment_id,
+                    self.current_block_idx,
+                    TARGET_BLOCK_SIZE,
+                    comp_len,
+                    block_crc,
+                    flags
+                )
+
+                with open(seg_path, "ab") as f:
+                    file_offset = f.tell()
+                    f.write(header)
+                    f.write(payload_bytes)
+                    f.flush()
+                    os.fsync(f.fileno())
+
+                self.block_offset_cache[(self.current_segment_id, self.current_block_idx)] = file_offset
+                self.current_block_idx += 1
+
+            refs = []
+            for i, loc_str in enumerate(loc_strs):
+                ref = RawRef.parse(loc_str)
+                ref.raw_sha256 = hashlib.sha256(raw_lines[i]).hexdigest()
+                refs.append(ref)
+
+            return refs
+
     def flush(self):
         """Public thread-safe flush method."""
         with self.lock:
             self._flush_locked()
+        try:
+            from storage.sinks import _flush_active_lakes
+            _flush_active_lakes()
+        except Exception:
+            pass
 
     def _flush_locked(self):
         """Internal flush (caller must hold self.lock)"""
@@ -222,18 +293,35 @@ class VaultStorage:
 
         # Compress
         flags = FLAG_NONE
-        if HAS_ZSTD:
-            flags |= FLAG_COMPRESSION_ZSTD
-            payload = self.cctx.compress(uncompressed_data)
-        else:
-            flags |= FLAG_COMPRESSION_ZLIB
-            payload = zlib.compress(uncompressed_data)
+        payload = None
 
-        if self.cipher_key:
-            flags |= FLAG_ENCRYPTED_CHACHA20
-            chacha = ChaCha20Poly1305(self.cipher_key)
-            nonce = os.urandom(12)
-            payload = nonce + chacha.encrypt(nonce, payload, None)
+        if HAS_RUST_CORE and not self.cipher_key and self.buffer_lines:
+            try:
+                blocks, _, crcs = ulpf_core_rs.vault_append_batch(
+                    self.buffer_lines,
+                    self.current_segment_id,
+                    self.current_block_idx
+                )
+                if blocks:
+                    flags |= FLAG_COMPRESSION_ZSTD
+                    payload = bytes(blocks[0])
+                    crc = crcs[0]
+            except Exception:
+                payload = None
+
+        if payload is None:
+            if HAS_ZSTD:
+                flags |= FLAG_COMPRESSION_ZSTD
+                payload = self.cctx.compress(uncompressed_data)
+            else:
+                flags |= FLAG_COMPRESSION_ZLIB
+                payload = zlib.compress(uncompressed_data)
+
+            if self.cipher_key:
+                flags |= FLAG_ENCRYPTED_CHACHA20
+                chacha = ChaCha20Poly1305(self.cipher_key)
+                nonce = os.urandom(12)
+                payload = nonce + chacha.encrypt(nonce, payload, None)
 
         comp_len = len(payload)
 
@@ -266,6 +354,7 @@ class VaultStorage:
         self.block_offset_cache[(self.current_segment_id, self.current_block_idx)] = file_offset
         self.current_block_idx += 1
         self.buffer.clear()
+        self.buffer_lines.clear()
         self.buffer_pending_locators.clear()
 
     def get_raw(self, locator: Any) -> bytes:

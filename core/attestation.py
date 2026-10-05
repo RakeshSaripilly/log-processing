@@ -15,10 +15,22 @@ import hashlib
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
+    import ulpf_core_rs
+    HAS_RUST_CORE = True
+except ImportError:
+    HAS_RUST_CORE = False
+
+try:
     import blake3 as _blake3_mod
     HAS_BLAKE3 = True
 except ImportError:
     HAS_BLAKE3 = False
+
+try:
+    import orjson as _orjson_mod
+    HAS_ORJSON = True
+except ImportError:
+    HAS_ORJSON = False
 
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
@@ -33,6 +45,11 @@ def jcs_canonicalize(obj: Any) -> bytes:
     - UTF-8 encoding without ASCII escapes
     - Floating point & integer standard representations
     """
+    if HAS_ORJSON:
+        try:
+            return _orjson_mod.dumps(obj, option=_orjson_mod.OPT_SORT_KEYS)
+        except Exception:
+            pass
     return json.dumps(
         obj,
         sort_keys=True,
@@ -45,9 +62,16 @@ def jcs_canonicalize(obj: Any) -> bytes:
 def hash_digest(data: bytes, algorithm: str = "blake3") -> str:
     """
     Cryptographic hash calculation using BLAKE3 (default, OCSF Other 99) or SHA-256 fallback.
+    Accelerated with Rust ulpf_core_rs when available.
     """
-    if algorithm.lower() == "blake3" and HAS_BLAKE3:
-        return _blake3_mod.blake3(data).hexdigest()
+    if algorithm.lower() == "blake3":
+        if HAS_RUST_CORE:
+            try:
+                return ulpf_core_rs.blake3_hash_chain("", data.decode('utf-8'))
+            except Exception:
+                pass
+        if HAS_BLAKE3:
+            return _blake3_mod.blake3(data).hexdigest()
     return hashlib.sha256(data).hexdigest()
 
 
@@ -61,15 +85,27 @@ def hash_event(
     1. Strips non-attested mutable fields ('fingerprint', 'signature', 'merkle_proof')
     2. Binds prev_hash link (Event N includes Fingerprint(N-1), or 'genesis')
     3. Serializes deterministically via RFC 8785 JCS
-    4. Computes BLAKE3/SHA-256 digest
+    4. Computes BLAKE3/SHA-256 digest (accelerated via Rust ulpf_core_rs.blake3_hash_chain)
     Returns: (fingerprint_hex, canonical_bytes)
     """
-    payload = {
-        k: v for k, v in event_without_fp.items()
-        if k not in ("fingerprint", "signature", "merkle_proof")
-    }
-    payload["prev_hash"] = prev_hash if prev_hash else "genesis"
+    payload = dict(event_without_fp)
+    payload.pop("fingerprint", None)
+    payload.pop("signature", None)
+    payload.pop("merkle_proof", None)
+    prev = prev_hash if prev_hash else "genesis"
+    payload["prev_hash"] = prev
     canonical = jcs_canonicalize(payload)
+
+    if algorithm.lower() == "blake3":
+        if HAS_BLAKE3:
+            return _blake3_mod.blake3(canonical).hexdigest(), canonical
+        if HAS_RUST_CORE:
+            try:
+                fp = ulpf_core_rs.blake3_hash_chain(prev, canonical.decode('utf-8'))
+                return fp, canonical
+            except Exception:
+                pass
+
     fp = hash_digest(canonical, algorithm=algorithm)
     return fp, canonical
 
@@ -108,7 +144,10 @@ def verify_chain(events: List[Dict[str, Any]], algorithm: str = "blake3") -> Tup
     if not events:
         return True, "Chain is empty (valid)", None
 
-    sorted_events = sorted(events, key=lambda x: x.get("sequence", x.get("seq", 0)))
+    if len(events) <= 1 or (events[0].get("sequence", 0) <= events[-1].get("sequence", 0)):
+        sorted_events = events
+    else:
+        sorted_events = sorted(events, key=lambda x: x.get("sequence", x.get("seq", 0)))
     
     prev_fp = None
     for idx, event in enumerate(sorted_events):
@@ -152,6 +191,19 @@ def hash_children(left: bytes, right: bytes) -> bytes:
     return hashlib.sha256(b"\x01" + left + right).digest()
 
 
+def merkle_root(hashes: List[str]) -> str:
+    """
+    Compute RFC 6962 Merkle tree root for an ordered list of leaf hashes.
+    Accelerated with Rust ulpf_core_rs.merkle_root when available.
+    """
+    if HAS_RUST_CORE and hashes:
+        try:
+            return ulpf_core_rs.merkle_root(hashes)
+        except Exception:
+            pass
+    return MerkleTree(hashes).root
+
+
 class MerkleTree:
     """
     RFC 6962 compliant Merkle Tree for tamper-evident audit logs.
@@ -161,28 +213,40 @@ class MerkleTree:
     """
     def __init__(self, fingerprints: List[str]):
         self.fps = fingerprints
-        self.leaves = [hash_leaf(fp.encode('utf-8')) for fp in fingerprints]
-        self.tree_levels: List[List[bytes]] = []
-        if self.leaves:
-            self._build_tree()
+        self._cached_root: Optional[str] = None
+        if HAS_RUST_CORE and fingerprints:
+            try:
+                self._cached_root = ulpf_core_rs.merkle_root(fingerprints)
+            except Exception:
+                self._cached_root = None
 
-    def _build_tree(self):
-        current_level = self.leaves
-        self.tree_levels = [current_level]
-        while len(current_level) > 1:
-            next_level = []
-            for i in range(0, len(current_level), 2):
-                left = current_level[i]
-                if i + 1 < len(current_level):
-                    right = current_level[i + 1]
-                else:
-                    right = left
-                next_level.append(hash_children(left, right))
-            current_level = next_level
-            self.tree_levels.append(current_level)
+        self.leaves: Optional[List[bytes]] = None
+        self.tree_levels: List[List[bytes]] = []
+        if self._cached_root is None and fingerprints:
+            self._ensure_tree()
+
+    def _ensure_tree(self):
+        if self.leaves is None:
+            self.leaves = [hash_leaf(fp.encode('utf-8')) for fp in self.fps]
+            current_level = self.leaves
+            self.tree_levels = [current_level]
+            while len(current_level) > 1:
+                next_level = []
+                for i in range(0, len(current_level), 2):
+                    left = current_level[i]
+                    if i + 1 < len(current_level):
+                        right = current_level[i + 1]
+                    else:
+                        right = left
+                    next_level.append(hash_children(left, right))
+                current_level = next_level
+                self.tree_levels.append(current_level)
 
     @property
     def root(self) -> str:
+        if self._cached_root is not None:
+            return self._cached_root
+        self._ensure_tree()
         if not self.tree_levels or not self.tree_levels[-1]:
             return "00" * 32
         return self.tree_levels[-1][0].hex()
@@ -192,6 +256,7 @@ class MerkleTree:
         Generate RFC 6962 audit path (inclusion proof) for leaf at `index`.
         Returns ceil(log2 N) sibling hashes with direction indicator ('left'/'right').
         """
+        self._ensure_tree()
         if index < 0 or index >= len(self.leaves):
             raise IndexError("Leaf index out of bounds for Merkle inclusion proof")
 

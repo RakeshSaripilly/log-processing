@@ -1,12 +1,55 @@
+# Python & Bytecode
 __pycache__/
-*.pyc
-*.pyo
-.pytest_cache/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.dylib
+*.dll
 *.egg-info/
+dist/
+build/
+wheels/
+*.whl
+
+# Virtual Environments
+*venv/
+.venv/
+env/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.maturin/
+
+# Rust & Cargo
+target/
+rust_core/target/
+**/*.rs.bk
+
+# Storage & Lake Artifacts
 lake/
 storage/raw/
 benchmarks/data/
 *.ulpf
-*.duckdb
-*venv
-output/*
+*.duckdb*
+*.wal
+*.parquet
+*.jsonl
+
+# Temporary outputs & test directories
+output_*/
+output/raw/
+output/lake/
+output/normalized.json
+output/metadata.json
+
+# IDEs & OS Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

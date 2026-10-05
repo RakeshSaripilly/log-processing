@@ -1,0 +1,17 @@
+[package]
+name = "ulpf_core_rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ulpf_core_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.21", features = ["extension-module"] }
+blake3 = "1.5"
+zstd = "0.13"
+crc32fast = "1.4"
+ed25519-dalek = "2.1"
+serde_json = "1.0"
+sha2 = "0.10"
