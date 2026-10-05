@@ -1,0 +1,58 @@
+========================================================================
+SIH26156 ULPF - RFC 6962 MERKLE INCLUSION PROOF AUDIT
+========================================================================
+Tree Standard:         RFC 6962 Certificate Transparency Domain Separation
+Leaf Hash:             SHA256(0x00 + event_fingerprint)
+Internal Node:         SHA256(0x01 + left_child + right_child)
+
+Audit Scale Metrics:
+[
+  {
+    "tree_size": 10,
+    "target_index": 5,
+    "merkle_root": "08663251ba324171182aa8fd9baa5d6820446225cb19b5791a8167526e596e57",
+    "proof_length": 4,
+    "theoretical_length": 4,
+    "generation_ms": 0.008,
+    "verification_ms": 0.013,
+    "verified": true
+  },
+  {
+    "tree_size": 100,
+    "target_index": 50,
+    "merkle_root": "76e01837d38d832ef4dba562bb22e3e95603476033bce85b54868713690ec2be",
+    "proof_length": 7,
+    "theoretical_length": 7,
+    "generation_ms": 0.01,
+    "verification_ms": 0.019,
+    "verified": true
+  },
+  {
+    "tree_size": 1000,
+    "target_index": 500,
+    "merkle_root": "76a730dcb4702f40a7b2f67bf402953d3bf1b315b0693c296fe54c4b976845df",
+    "proof_length": 10,
+    "theoretical_length": 10,
+    "generation_ms": 0.014,
+    "verification_ms": 0.023,
+    "verified": true
+  },
+  {
+    "tree_size": 5000,
+    "target_index": 2500,
+    "merkle_root": "22cc440e74df8ec1159e20288a6ab0634533c9a2b9d20affdb9f8a7c88efac51",
+    "proof_length": 13,
+    "theoretical_length": 13,
+    "generation_ms": 0.02,
+    "verification_ms": 0.034,
+    "verified": true
+  }
+]
+
+Detailed Sample (1,000 Event Tree):
+  Root:                76a730dcb4702f40a7b2f67bf402953d3bf1b315b0693c296fe54c4b976845df
+  Target Sequence:     500
+  Proof Length:        10 hashes (ceil(log2 1000) = 10)
+  Generation Latency:  0.014 ms
+  Verification Status: VALID [PASS]
+========================================================================

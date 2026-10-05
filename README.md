@@ -10,7 +10,7 @@
 ---
 
 ## 🌟 Architectural Novelty (Vault-First + Vector Matcher + Hash Chain)
-ULPF ingests heterogeneous logs from firewalls, IDS/IPS, proxies, web servers, and proprietary devices, normalizes them into **OCSF 1.9**, guarantees **100% lossless raw capture**, and provides blockchain-grade **tamper-evident attestation**.
+ULPF ingests heterogeneous logs from firewalls, IDS/IPS, proxies, web servers, and proprietary devices, normalizes them into **OCSF 1.9**, guarantees **lossless raw capture with verified byte-exact retrieval**, and provides **cryptographically verifiable tamper-evident attestation**.
 
 ```
 [Raw Bytes Stream] 
@@ -46,6 +46,42 @@ ULPF ingests heterogeneous logs from firewalls, IDS/IPS, proxies, web servers, a
         ▼
 [7. LAKE & OUTPUT SINKS] ──► DuckDB + Date Partitioned Parquet + NDJSON + Wazuh UDP Forwarder
 ```
+
+---
+
+## 💻 CLI Usage
+
+The ULPF Command Line Interface (`ulpf`) is the primary operational interface to the ULPF Python framework. It provides air-gapped, zero-socket log processing through the complete 7-stage pipeline (Vault Write-Before-Parse, Detection, Parsing, OCSF 1.9 Normalization, Validation, Raw Evidence Preservation, and Cryptographic Attestation).
+
+### Installation
+```bash
+pip install -e .
+```
+
+### Commands
+
+```bash
+# 1. View CLI documentation & available options
+ulpf --help
+
+# 2. Process a log file with default output directory (output/)
+ulpf process samples/example.log
+
+# 3. Process with custom output destination
+ulpf process samples/example.log --output output/
+
+# 4. Machine-readable JSON output mode (ideal for piping to jq/SIEM)
+ulpf process samples/example.log --json
+```
+
+Optional arguments:
+- `--output, -o <dir>`: Custom destination for normalized logs, raw evidence, and metadata.
+- `--format, -f <format>`: Explicit log format hint (`cef`, `json`, `syslog`, `cisco_asa`, etc.).
+- `--config, -c <config>`: Path to YAML or JSON configuration file.
+- `--source, -s <source>`: Vendor or source label (e.g. `Firewall`, `Linux SSHD`, `Suricata`).
+- `--no-integrity`: Skip continuous cryptographic hash chain verification.
+- `--json`: Output machine-readable JSON only.
+- `--verbose`: Enable debug tracebacks on error.
 
 ---
 
@@ -93,7 +129,7 @@ curl -X POST http://localhost:8000/tamper-test -H "Content-Type: application/jso
    Ingest unmapped proprietary log `VENDOR-X|9921|CRIT|disk_array_2|temp=88C|status=degrading`. Open `/review-queue` in UI, demonstrate confidence score, click **"Approve & Promote"**, and show hot promotion to active configuration without restarting.
 3. **1:00 - 1:40 (Byte-Exact Vault Retrieval & Chain Verification):**  
    Call `client.get_raw(event_id)`. Show exact raw payload from zstd block with SHA-256 match. Call `client.verify_chain()`, showing 100% cryptographic integrity.
-4. **1:40 - 2:00 (Live Tamper Attack & Zero-Knowledge Merkle Proof):**  
+4. **1:40 - 2:00 (Live Tamper Attack & RFC 6962 Merkle Inclusion Proof):**  
    Trigger `/tamper-test` on sequence 0. Show the console immediately turn red with exact broken sequence number `0`. Generate Merkle proof at sequence 0 with $\lceil \log_2 N \rceil$ sibling hashes verifying event inclusion without exposing vault data.
 
 ---
@@ -122,11 +158,11 @@ spark_df = client.query().to_spark()
 X, feature_names = client.to_features(window="5min")
 print(f"ML Features Matrix Shape: {X.shape}, Features: {feature_names}")
 
-# 6. Verify Blockchain Hash Chain
+# 6. Verify Continuous Hash Chain (RFC 8785 + BLAKE3)
 is_valid, msg, broken_seq = client.verify_chain()
 print(f"Chain Verified: {is_valid} ({msg})")
 
-# 7. Generate Zero-Knowledge RFC 6962 Inclusion Proof
+# 7. Generate RFC 6962 Merkle Inclusion Proof
 proof = client.prove(event_seq=0)
 print(f"Merkle Root: {proof['merkle_root']}, Verified: {proof['verified']}")
 ```

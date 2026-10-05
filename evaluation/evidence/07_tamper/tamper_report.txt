@@ -1,0 +1,22 @@
+========================================================================
+SIH26156 ULPF - CRYPTOGRAPHIC TAMPER DETECTION DEMONSTRATION
+========================================================================
+BEFORE ATTACK:
+  Chain Status:        VALID [PASS] (Verified across 100 events)
+
+ATTACK INJECTION:
+  Target Event:        Sequence #42
+  Field Tampered:      src_endpoint.ip
+  Original Value:      192.0.2.42
+  Tampered Value:      198.51.100.99
+
+AFTER ATTACK (VERIFICATION RUN):
+  Endpoint:            /verify or client.verify_chain()
+  Chain Status:        INVALID [TAMPER DETECTED]
+  Broken Sequence:     #42
+  Diagnostic Message:  Tamper detected at seq=42: recalculated fingerprint 'ced9218aa478d6c24371098ec815ad2105d39bbf72acbc8281de9c76a48264c3' does not match stored fingerprint 'dca8e5703b8644b41fb2d528e0690db9846ad1253ac6a9163ade07bb53923be4'
+
+DELETION ATTACK TEST:
+  Deleted Event:       Sequence #20
+  Result:              INVALID [CHAIN BREAK DETECTED] at sequence #21
+========================================================================

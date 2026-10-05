@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+"""
+Universal Log Pre-processing Framework (ULPF) CLI Runner
+"""
+import sys
+from core.cli import main
+
+if __name__ == "__main__":
+    sys.exit(main())

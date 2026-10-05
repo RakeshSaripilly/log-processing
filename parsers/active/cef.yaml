@@ -1,0 +1,25 @@
+name: ArcSight CEF Firewall
+vendor: Firewall
+product: CEF
+version: "1.0"
+class_uid: 4001
+category_uid: 4
+detection:
+  patterns:
+    - "^CEF:\\d+\\|"
+    - "\\s+CEF:\\d+\\|"
+decoders:
+  - cef
+mappings:
+  device_vendor: metadata.product.vendor_name
+  device_product: metadata.product.name
+  device_version: metadata.product.version
+  device_event_class_id: metadata.event_code
+  name: activity_name
+  severity: severity
+labels:
+  - cef
+  - firewall
+  - security
+fixtures:
+  - raw: "CEF:0|CheckPoint|Firewall-1|R80|drop|Drop packet|High|src=198.51.100.22 dst=192.0.2.80 spt=51234 dpt=443 proto=TCP act=drop"

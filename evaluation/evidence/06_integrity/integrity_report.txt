@@ -1,0 +1,13 @@
+========================================================================
+SIH26156 ULPF - CRYPTOGRAPHIC INTEGRITY VERIFICATION SUITE
+========================================================================
+Canonical Scheme:      RFC 8785 JSON Canonicalization Scheme (JCS)
+Digest Algorithm:      BLAKE3 (OCSF Profile)
+Total Events Linked:   2,000
+Chain Integrity:       PASS (Cryptographic chain verified across 2000 events without tamper)
+Verification Speed:    90,330 events/sec (22.14 ms)
+Merkle Tree Root:      2f03d67fc8911bf92549d972badf2555adcda30e44465ba6ec6a83e839104351
+Merkle Inclusion Proof: PASS (11 sibling hashes for leaf 1000)
+Ed25519 Checkpoint:    PASS (Signature verified against public key)
+Signer Public Key:     7fa6bfbd450165bd20489ae13431bf8b11703bc61dc237e32edf942a8a404897
+========================================================================

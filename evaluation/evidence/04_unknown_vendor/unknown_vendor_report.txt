@@ -1,0 +1,22 @@
+========================================================================
+SIH26156 ULPF - ZERO-CODE UNKNOWN VENDOR ONBOARDING DEMONSTRATION
+========================================================================
+Unknown Input:        VENDOR-X|9921|CRIT|disk_array_2|temp=88C|status=degrading
+Drain3 Template:      VENDOR-X|<NUM>|CRIT|disk_array_2|temp=88C|status=degrading
+RawRef Locator:       ulpf:raw:0:0:0:57
+
+Field Analysis:
+  - 'status' -> activity_name | Conf: 0.94 | Decision: AUTO_MAP
+  - 'temp'   -> custom.vendor_x.temp   | Conf: 0.2914 | Decision: CUSTOM_FALLBACK
+
+Confidence Routing Thresholds:
+  - AUTO_MAP:        >= 0.85 (Direct canonical OCSF normalization)
+  - HUMAN_REVIEW:    0.60 - 0.85 (Enqueued in HITL Review Queue)
+  - CUSTOM_FALLBACK: < 0.60 (Preserved under custom.<vendor>.<field>)
+
+HITL Promotion:
+  - Queued Field:    'client_node' (Confidence: 0.87)
+  - Suggested:       src_endpoint.ip
+  - Promoted Target: src_endpoint.ip
+  - Hot Promotion:   SUCCESS (Zero server restart required)
+========================================================================

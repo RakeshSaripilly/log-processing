@@ -1,0 +1,22 @@
+{
+  "raw_log": "Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2",
+  "decoded_fields": {
+    "user": "root",
+    "src_ip": "192.0.2.15",
+    "src_port": "54322",
+    "app": "sshd",
+    "action": "Accepted"
+  },
+  "ocsf_fields": {
+    "version": "1.9.0",
+    "class_uid": 3001,
+    "class_name": "Authentication (3001)",
+    "actor.user.name": "root",
+    "src_endpoint.ip": "192.0.2.15",
+    "src_endpoint.port": "54322",
+    "fingerprint": "d3d719b176d9afce58926fbd6e94c753e369c20de5b149d33a9778e54e687388",
+    "prev_hash": "genesis"
+  },
+  "raw_ref": "ulpf:raw:0:0:0:94",
+  "raw_sha256": "a3f6d660d88d5f0b7bad67a41bc52977597a62254239169b71a77f715710baef"
+}

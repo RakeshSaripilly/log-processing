@@ -126,14 +126,23 @@ class PackRegistry:
                 logger.error(f"Error loading pack '{yml_path.name}': {e} - SKIPPING")
 
         self.packs = loaded
+        self._match_cache: Dict[str, Optional[CompiledSourcePack]] = {}
         self.last_load_time = time.time()
 
     def find_matching_pack(self, raw_text: str) -> Optional[CompiledSourcePack]:
         """
-        Linear scan through compiled packs on hot path.
+        Scan compiled packs on hot path with fast prefix cache.
         Returns first pack whose identity detector claims the log.
         """
+        prefix = raw_text[:48]
+        if prefix in self._match_cache:
+            return self._match_cache[prefix]
+
         for pack in self.packs.values():
             if pack.claims(raw_text):
+                if len(self._match_cache) < 4096:
+                    self._match_cache[prefix] = pack
                 return pack
+        if len(self._match_cache) < 4096:
+            self._match_cache[prefix] = None
         return None

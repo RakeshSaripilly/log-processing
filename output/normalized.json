@@ -1,0 +1,262 @@
+[
+  {
+    "metadata": {
+      "version": "1.9.0",
+      "product": {
+        "name": "Firewall-1",
+        "vendor_name": "CheckPoint",
+        "version": "R80"
+      },
+      "profiles": [
+        "host",
+        "security_control"
+      ],
+      "original_time": "1791192098516",
+      "labels": [],
+      "event_code": "drop"
+    },
+    "class_uid": 4001,
+    "category_uid": 4,
+    "time": 1791192098516,
+    "raw_data": "CEF:0|CheckPoint|Firewall-1|R80|drop|Drop packet|High|src=198.51.100.22 dst=192.0.2.80 spt=51234 dpt=443 proto=TCP act=drop",
+    "unmapped": {
+      "ulpf_raw_locator": "ulpf:raw:0:6:0:123",
+      "raw_sha256": "a3212b3f9719274843da9d045ec654ee04474a7b1a903b330361c3e9c9a5f13f",
+      "cef_version": "0",
+      "extension": {
+        "src": "198.51.100.22",
+        "dst": "192.0.2.80",
+        "spt": "51234",
+        "dpt": "443",
+        "proto": "TCP",
+        "act": "drop"
+      }
+    },
+    "activity_name": "drop",
+    "severity": "High",
+    "connection_info": {
+      "protocol_name": "TCP"
+    },
+    "disposition_id": 2,
+    "src_endpoint": {
+      "ip": "198.51.100.22",
+      "port": 51234
+    },
+    "dst_endpoint": {
+      "ip": "192.0.2.80",
+      "port": 443
+    },
+    "sequence": 30,
+    "event_id": "34e9c10c-eafb-4b9b-bd52-151852e92334",
+    "fingerprint": "5d2817e7df9435c08b2a8a0776d4cb38d0b9d8879e0b8226c7903e8885757b24",
+    "prev_hash": "84cbc4b4b7f27265a01bb87c225ab3f62a48716791630dfa827c92c24c5d46a7"
+  },
+  {
+    "metadata": {
+      "version": "1.9.0",
+      "product": {
+        "name": "Firewall-1",
+        "vendor_name": "CheckPoint",
+        "version": "R80"
+      },
+      "profiles": [
+        "host",
+        "security_control"
+      ],
+      "original_time": "1791192098573",
+      "labels": [],
+      "event_code": "accept"
+    },
+    "class_uid": 4001,
+    "category_uid": 4,
+    "time": 1791192098573,
+    "raw_data": "CEF:0|CheckPoint|Firewall-1|R80|accept|Accept connection|Low|src=192.0.2.15 dst=198.51.100.44 spt=43121 dpt=22 proto=TCP act=accept",
+    "unmapped": {
+      "ulpf_raw_locator": "ulpf:raw:0:6:123:131",
+      "raw_sha256": "cba1ee0043e119fc7d726510005f6b493a325206d3c3107c8b013eafa312d336",
+      "cef_version": "0",
+      "extension": {
+        "src": "192.0.2.15",
+        "dst": "198.51.100.44",
+        "spt": "43121",
+        "dpt": "22",
+        "proto": "TCP",
+        "act": "accept"
+      }
+    },
+    "activity_name": "accept",
+    "severity": "Low",
+    "connection_info": {
+      "protocol_name": "TCP"
+    },
+    "disposition_id": 1,
+    "src_endpoint": {
+      "ip": "192.0.2.15",
+      "port": 43121
+    },
+    "dst_endpoint": {
+      "ip": "198.51.100.44",
+      "port": 22
+    },
+    "sequence": 31,
+    "event_id": "629afa32-eee8-4591-afe8-655c1a268bf5",
+    "fingerprint": "6f1798cd0ee9f2a737fee392894432d1dfc6d9c1c75d9b3c96637e02232c8cd7",
+    "prev_hash": "5d2817e7df9435c08b2a8a0776d4cb38d0b9d8879e0b8226c7903e8885757b24"
+  },
+  {
+    "metadata": {
+      "version": "1.9.0",
+      "product": {
+        "name": "PAN-OS",
+        "vendor_name": "PaloAlto",
+        "version": "10.1"
+      },
+      "profiles": [
+        "host",
+        "security_control"
+      ],
+      "original_time": "1791192098598",
+      "labels": [],
+      "event_code": "traffic"
+    },
+    "class_uid": 4001,
+    "category_uid": 4,
+    "time": 1791192098598,
+    "raw_data": "CEF:0|PaloAlto|PAN-OS|10.1|traffic|Traffic permit|Medium|src=203.0.113.55 dst=192.0.2.99 spt=49152 dpt=80 proto=TCP act=permit",
+    "unmapped": {
+      "ulpf_raw_locator": "ulpf:raw:0:6:254:126",
+      "raw_sha256": "0b8688987baa9a1c63cc87a4aaae6030c52daf605d3df7976bceeba7523d644f",
+      "cef_version": "0",
+      "extension": {
+        "src": "203.0.113.55",
+        "dst": "192.0.2.99",
+        "spt": "49152",
+        "dpt": "80",
+        "proto": "TCP",
+        "act": "permit"
+      }
+    },
+    "activity_name": "permit",
+    "severity": "Medium",
+    "connection_info": {
+      "protocol_name": "TCP"
+    },
+    "disposition_id": 1,
+    "src_endpoint": {
+      "ip": "203.0.113.55",
+      "port": 49152
+    },
+    "dst_endpoint": {
+      "ip": "192.0.2.99",
+      "port": 80
+    },
+    "sequence": 32,
+    "event_id": "de6256aa-e818-415d-aa05-913df1fbcab7",
+    "fingerprint": "e94c5f2b8d01a612cc2e3fa045e2d19c97a47b594a3e70dbc9ab607fa59c5c59",
+    "prev_hash": "6f1798cd0ee9f2a737fee392894432d1dfc6d9c1c75d9b3c96637e02232c8cd7"
+  },
+  {
+    "metadata": {
+      "version": "1.9.0",
+      "product": {
+        "name": "ASA",
+        "vendor_name": "Cisco",
+        "version": "9.16"
+      },
+      "profiles": [
+        "host",
+        "security_control"
+      ],
+      "original_time": "1791192098627",
+      "labels": [],
+      "event_code": "deny"
+    },
+    "class_uid": 4001,
+    "category_uid": 4,
+    "time": 1791192098627,
+    "raw_data": "CEF:0|Cisco|ASA|9.16|deny|Deny inbound connection|High|src=198.51.100.99 dst=192.0.2.14 spt=53211 dpt=23 proto=TCP act=deny",
+    "unmapped": {
+      "ulpf_raw_locator": "ulpf:raw:0:6:380:123",
+      "raw_sha256": "6f24321352dd3bcd64d449e03ab29cf8d2b1b73c1bb12e6b4cdfc9ee0dca824f",
+      "cef_version": "0",
+      "extension": {
+        "src": "198.51.100.99",
+        "dst": "192.0.2.14",
+        "spt": "53211",
+        "dpt": "23",
+        "proto": "TCP",
+        "act": "deny"
+      }
+    },
+    "activity_name": "deny",
+    "severity": "High",
+    "connection_info": {
+      "protocol_name": "TCP"
+    },
+    "disposition_id": 2,
+    "src_endpoint": {
+      "ip": "198.51.100.99",
+      "port": 53211
+    },
+    "dst_endpoint": {
+      "ip": "192.0.2.14",
+      "port": 23
+    },
+    "sequence": 33,
+    "event_id": "06b43618-74fb-456a-a1ad-f77d3219d80f",
+    "fingerprint": "2d303d27603bb7979cee997c4db77a311c05c9c5598d2bd45238441846e48726",
+    "prev_hash": "e94c5f2b8d01a612cc2e3fa045e2d19c97a47b594a3e70dbc9ab607fa59c5c59"
+  },
+  {
+    "metadata": {
+      "version": "1.9.0",
+      "product": {
+        "name": "FortiOS",
+        "vendor_name": "Fortinet",
+        "version": "7.2"
+      },
+      "profiles": [
+        "host",
+        "security_control"
+      ],
+      "original_time": "1791192098652",
+      "labels": [],
+      "event_code": "policy-violation"
+    },
+    "class_uid": 4001,
+    "category_uid": 4,
+    "time": 1791192098652,
+    "raw_data": "CEF:0|Fortinet|FortiOS|7.2|policy-violation|Blocked by security policy|Critical|src=203.0.113.12 dst=192.0.2.77 spt=52110 dpt=445 proto=TCP act=drop",
+    "unmapped": {
+      "ulpf_raw_locator": "ulpf:raw:0:6:503:148",
+      "raw_sha256": "d9a2e2d9f920ba979cda29aa7eff08d89e93830600ca77c433ecbc134566efb0",
+      "cef_version": "0",
+      "extension": {
+        "src": "203.0.113.12",
+        "dst": "192.0.2.77",
+        "spt": "52110",
+        "dpt": "445",
+        "proto": "TCP",
+        "act": "drop"
+      }
+    },
+    "activity_name": "drop",
+    "severity": "Critical",
+    "connection_info": {
+      "protocol_name": "TCP"
+    },
+    "disposition_id": 2,
+    "src_endpoint": {
+      "ip": "203.0.113.12",
+      "port": 52110
+    },
+    "dst_endpoint": {
+      "ip": "192.0.2.77",
+      "port": 445
+    },
+    "sequence": 34,
+    "event_id": "0704591d-3a8c-4c9a-8031-462fd4db574e",
+    "fingerprint": "5760d3825dd0989db2caeab3cff9ecde50f81100008b7946656bba741d6b4dfc",
+    "prev_hash": "2d303d27603bb7979cee997c4db77a311c05c9c5598d2bd45238441846e48726"
+  }
+]

@@ -1,0 +1,24 @@
+name: Nginx Access Log
+vendor: F5 Nginx
+product: Nginx
+version: "1.24"
+class_uid: 4001
+category_uid: 4
+detection:
+  patterns:
+    - '^\d+\.\d+\.\d+\.\d+\s+-\s+\[\d{2}/[A-Za-z]{3}/\d{4}:\d{2}:\d{2}:\d{2}'
+decoders:
+  - regex
+regex_pattern: '^(?P<src_ip>\d+\.\d+\.\d+\.\d+)\s+-\s+\[(?P<timestamp>[^\]]+)\]\s+"(?P<http_method>[A-Z]+)\s+(?P<url>[^\s]+)\s+HTTP/[0-9.]+"\s+(?P<status_code>\d+)\s+(?P<bytes_sent>\d+)\s+"(?P<referrer>[^"]*)"\s+"(?P<user_agent>[^"]*)"'
+mappings:
+  src_ip: src_endpoint.ip
+  http_method: http_request.http_method
+  url: http_request.url
+  status_code: status_id
+labels:
+  - web
+  - nginx
+  - proxy
+fixtures:
+  - raw: '198.51.100.89 - [26/Sep/2026:15:10:00 +0000] "POST /login HTTP/2.0" 401 532 "https://example.com" "Mozilla/5.0"'
+    expected_ip: "198.51.100.89"

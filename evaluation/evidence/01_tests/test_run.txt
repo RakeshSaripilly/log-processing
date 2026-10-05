@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0 -- C:\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: C:\College\SIH2026\SIH26156\ULPF
+plugins: anyio-4.14.0, langsmith-0.8.16
+collecting ... collected 28 items
+
+tests/test_airgap.py::test_zero_external_socket_calls_during_pipeline_run PASSED [  3%]
+tests/test_decoders.py::test_syslog_rfc3164 PASSED                       [  7%]
+tests/test_decoders.py::test_syslog_rfc5424 PASSED                       [ 10%]
+tests/test_decoders.py::test_keyvalue PASSED                             [ 14%]
+tests/test_decoders.py::test_csv_line PASSED                             [ 17%]
+tests/test_decoders.py::test_cef PASSED                                  [ 21%]
+tests/test_decoders.py::test_leef PASSED                                 [ 25%]
+tests/test_decoders.py::test_json PASSED                                 [ 28%]
+tests/test_decoders.py::test_xml PASSED                                  [ 32%]
+tests/test_decoders.py::test_regex PASSED                                [ 35%]
+tests/test_decoders.py::test_salvage_observables PASSED                  [ 39%]
+tests/test_integrity.py::test_rfc8785_jcs_canonicalization PASSED        [ 42%]
+tests/test_integrity.py::test_hash_chain_creation_and_verification PASSED [ 46%]
+tests/test_integrity.py::test_rfc6962_merkle_tree_inclusion_proof PASSED [ 50%]
+tests/test_integrity.py::test_ed25519_checkpoint_signature PASSED        [ 53%]
+tests/test_tamper.py::test_tamper_detection_breaks_chain PASSED          [ 57%]
+tests/test_tamper.py::test_tamper_deletion_breaks_chain PASSED           [ 60%]
+tests/test_ulpf_py.py::test_client_query_predicate_and_pandas PASSED     [ 64%]
+tests/test_ulpf_py.py::test_client_arrow_and_spark PASSED                [ 67%]
+tests/test_ulpf_py.py::test_client_get_raw_and_lineage PASSED            [ 71%]
+tests/test_ulpf_py.py::test_client_prove_merkle PASSED                   [ 75%]
+tests/test_ulpf_py.py::test_client_to_features PASSED                    [ 78%]
+tests/test_vault.py::test_write_before_parse_and_lossless_retrieval PASSED [ 82%]
+tests/test_vault.py::test_vault_crash_recovery_scan_headers PASSED       [ 85%]
+tests/test_vector_matcher.py::test_type_inference PASSED                 [ 89%]
+tests/test_vector_matcher.py::test_confidence_routing_auto_map PASSED    [ 92%]
+tests/test_vector_matcher.py::test_confidence_routing_review_queue PASSED [ 96%]
+tests/test_vector_matcher.py::test_confidence_routing_custom_fallback PASSED [100%]
+
+============================= 28 passed in 2.57s ==============================
+

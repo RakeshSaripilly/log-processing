@@ -65,6 +65,11 @@ def normalize_to_ocsf(
         vendor_name = pack_metadata.get("vendor", "Generic")
         product_name = pack_metadata.get("product", "Unknown")
 
+    if "device_vendor" in extracted_data:
+        vendor_name = str(extracted_data["device_vendor"])
+    if "device_product" in extracted_data:
+        product_name = str(extracted_data["device_product"])
+
     # Base OCSF 1.9 event envelope
     ocsf_event: Dict[str, Any] = {
         "metadata": {
@@ -134,6 +139,27 @@ def normalize_to_ocsf(
         else:
             # Preserve unknown fields under unmapped
             ocsf_event["unmapped"][src_key] = raw_val
+
+    # Unpack extension dict if present (e.g. from CEF / LEEF decoders)
+    ext_data = extracted_data.get("extension")
+    if isinstance(ext_data, dict):
+        for ek, ev in ext_data.items():
+            if ek in ("src", "srcip", "saddr", "src_ip"):
+                src_endpoint["ip"] = str(ev)
+            elif ek in ("dst", "dstip", "daddr", "dst_ip"):
+                dst_endpoint["ip"] = str(ev)
+            elif ek in ("spt", "src_port", "sport"):
+                try: src_endpoint["port"] = int(ev)
+                except (ValueError, TypeError): pass
+            elif ek in ("dpt", "dst_port", "dport"):
+                try: dst_endpoint["port"] = int(ev)
+                except (ValueError, TypeError): pass
+            elif ek in ("act", "action"):
+                val_lower = str(ev).lower()
+                ocsf_event["activity_name"] = str(ev)
+                ocsf_event["disposition_id"] = DISPOSITION_MAP.get(val_lower, 0)
+            elif ek in ("proto", "protocol"):
+                _set_nested(ocsf_event, "connection_info.protocol_name", str(ev))
 
     if src_endpoint:
         ocsf_event["src_endpoint"] = src_endpoint

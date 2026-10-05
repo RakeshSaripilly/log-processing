@@ -1,0 +1,5 @@
+Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2
+Oct 12 10:14:25 web-01 sshd[12446]: Failed password for invalid user admin from 198.51.100.44 port 43121 ssh2
+%ASA-6-302013: Built outbound TCP connection 99812 for outside:198.51.100.22/443 to inside:192.0.2.80/51234
+%ASA-4-106023: Deny tcp src outside:203.0.113.55/49152 dst inside:192.0.2.99/80 by access-group "acl_outside"
+<165>1 2026-09-26T22:14:15.003Z edge-firewall.corp.net myproc 1245 ID47 [exampleSDID@32473 iut="3" eventSource="Application"] Connection established with remote peer 203.0.113.91

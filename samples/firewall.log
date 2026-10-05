@@ -1,0 +1,5 @@
+CEF:0|CheckPoint|Firewall-1|R80|drop|Drop packet|High|src=198.51.100.22 dst=192.0.2.80 spt=51234 dpt=443 proto=TCP act=drop
+CEF:0|CheckPoint|Firewall-1|R80|accept|Accept connection|Low|src=192.0.2.15 dst=198.51.100.44 spt=43121 dpt=22 proto=TCP act=accept
+CEF:0|PaloAlto|PAN-OS|10.1|traffic|Traffic permit|Medium|src=203.0.113.55 dst=192.0.2.99 spt=49152 dpt=80 proto=TCP act=permit
+CEF:0|Cisco|ASA|9.16|deny|Deny inbound connection|High|src=198.51.100.99 dst=192.0.2.14 spt=53211 dpt=23 proto=TCP act=deny
+CEF:0|Fortinet|FortiOS|7.2|policy-violation|Blocked by security policy|Critical|src=203.0.113.12 dst=192.0.2.77 spt=52110 dpt=445 proto=TCP act=drop

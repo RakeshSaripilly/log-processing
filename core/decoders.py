@@ -37,9 +37,9 @@ LEEF_PATTERN = re.compile(
     r"(?P<version>[^|]*)\|(?P<event_id>[^|]*)\|(?P<extension>.*)$"
 )
 
-# Key-Value pairs parser (handles key=val, key="spaced val", key='spaced val')
+# Key-Value pairs parser (handles key=val, key="spaced val", key='spaced val', pipe/comma delimiters)
 KV_PATTERN = re.compile(
-    r'(?P<key>[a-zA-Z0-9_\.\-]+)=(?P<val>"[^"]*"|\'[^\']*\'|[^\s]+)'
+    r'(?P<key>[a-zA-Z0-9_\.\-]+)=(?P<val>"[^"]*"|\'[^\']*\'|[^\|\s,;]+)'
 )
 
 

@@ -1,0 +1,919 @@
+{
+  "metadata": {
+    "framework": "Universal Log Pre-processing Framework (ULPF)",
+    "problem_statement": "SIH26156 (NTRO)",
+    "theme": "Blockchain & Cybersecurity",
+    "team": "LunarX",
+    "environment": {
+      "timestamp": "2026-09-28T19:21:49.138751+00:00",
+      "git_commit": "257d12f27e4453616ad90f754e10ebec51bb3262",
+      "git_status": "modified",
+      "python_version": "3.13.9",
+      "python_compiler": "MSC v.1944 64 bit (AMD64)",
+      "os": "Windows-11-10.0.26200-SP0",
+      "system": "Windows",
+      "release": "11",
+      "cpu_processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+      "cpu_cores": 12,
+      "ram_gb": 15.7,
+      "zstd_available": true,
+      "blake3_available": true
+    }
+  },
+  "tests": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "duration_sec": 5.11,
+    "return_code": 0,
+    "pass_rate": 100.0,
+    "raw_output": "============================= test session starts =============================\nplatform win32 -- Python 3.13.9, pytest-9.1.1, pluggy-1.6.0 -- C:\\Python313\\python.exe\ncachedir: .pytest_cache\nrootdir: C:\\College\\SIH2026\\SIH26156\\ULPF\nplugins: anyio-4.14.0, langsmith-0.8.16\ncollecting ... collected 28 items\n\ntests/test_airgap.py::test_zero_external_socket_calls_during_pipeline_run PASSED [  3%]\ntests/test_decoders.py::test_syslog_rfc3164 PASSED                       [  7%]\ntests/test_decoders.py::test_syslog_rfc5424 PASSED                       [ 10%]\ntests/test_decoders.py::test_keyvalue PASSED                             [ 14%]\ntests/test_decoders.py::test_csv_line PASSED                             [ 17%]\ntests/test_decoders.py::test_cef PASSED                                  [ 21%]\ntests/test_decoders.py::test_leef PASSED                                 [ 25%]\ntests/test_decoders.py::test_json PASSED                                 [ 28%]\ntests/test_decoders.py::test_xml PASSED                                  [ 32%]\ntests/test_decoders.py::test_regex PASSED                                [ 35%]\ntests/test_decoders.py::test_salvage_observables PASSED                  [ 39%]\ntests/test_integrity.py::test_rfc8785_jcs_canonicalization PASSED        [ 42%]\ntests/test_integrity.py::test_hash_chain_creation_and_verification PASSED [ 46%]\ntests/test_integrity.py::test_rfc6962_merkle_tree_inclusion_proof PASSED [ 50%]\ntests/test_integrity.py::test_ed25519_checkpoint_signature PASSED        [ 53%]\ntests/test_tamper.py::test_tamper_detection_breaks_chain PASSED          [ 57%]\ntests/test_tamper.py::test_tamper_deletion_breaks_chain PASSED           [ 60%]\ntests/test_ulpf_py.py::test_client_query_predicate_and_pandas PASSED     [ 64%]\ntests/test_ulpf_py.py::test_client_arrow_and_spark PASSED                [ 67%]\ntests/test_ulpf_py.py::test_client_get_raw_and_lineage PASSED            [ 71%]\ntests/test_ulpf_py.py::test_client_prove_merkle PASSED                   [ 75%]\ntests/test_ulpf_py.py::test_client_to_features PASSED                    [ 78%]\ntests/test_vault.py::test_write_before_parse_and_lossless_retrieval PASSED [ 82%]\ntests/test_vault.py::test_vault_crash_recovery_scan_headers PASSED       [ 85%]\ntests/test_vector_matcher.py::test_type_inference PASSED                 [ 89%]\ntests/test_vector_matcher.py::test_confidence_routing_auto_map PASSED    [ 92%]\ntests/test_vector_matcher.py::test_confidence_routing_review_queue PASSED [ 96%]\ntests/test_vector_matcher.py::test_confidence_routing_custom_fallback PASSED [100%]\n\n============================= 28 passed in 2.57s ==============================\n\n"
+  },
+  "lossless_preservation": {
+    "events_tested": 10000,
+    "events_stored": 10000,
+    "events_recovered": 10000,
+    "sha256_matches": 10000,
+    "mismatches": 0,
+    "recovery_failures": 0,
+    "success_rate": 100.0,
+    "write_duration_sec": 0.301,
+    "read_duration_sec": 18.693,
+    "write_eps": 33184.6,
+    "read_eps": 535.0,
+    "categories_tested": 23,
+    "category_summary": {
+      "vendor_linux_sshd": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_cisco_asa": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_suricata_eve": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_palo_alto": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_aws_vpc": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_fortinet": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_rfc5424": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_windows_xml": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "vendor_clean_json": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "multiline_java_stacktrace": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "multiline_python_traceback": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "special_chars_and_escapes": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unicode_multilingual_hindi": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unicode_multilingual_chinese": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unicode_multilingual_arabic": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unicode_multilingual_russian": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unicode_multilingual_emojis": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unknown_vendor_x": {
+        "tested": 435,
+        "recovered": 435,
+        "sha_matches": 435
+      },
+      "unknown_sensor_kv": {
+        "tested": 434,
+        "recovered": 434,
+        "sha_matches": 434
+      },
+      "edge_empty_newline": {
+        "tested": 434,
+        "recovered": 434,
+        "sha_matches": 434
+      },
+      "edge_single_byte": {
+        "tested": 434,
+        "recovered": 434,
+        "sha_matches": 434
+      },
+      "edge_whitespace_only": {
+        "tested": 434,
+        "recovered": 434,
+        "sha_matches": 434
+      },
+      "edge_large_payload_64k": {
+        "tested": 434,
+        "recovered": 434,
+        "sha_matches": 434
+      }
+    }
+  },
+  "ocsf_normalization": {
+    "events_tested": 13,
+    "normalized": 13,
+    "valid": 13,
+    "invalid": 0,
+    "validation_rate": 100.0,
+    "rawref_preservation_rate": 100.0,
+    "lineage_preservation_rate": 100.0,
+    "compact_example": {
+      "raw_log": "Oct 12 10:14:22 web-01 sshd[12445]: Accepted password for root from 192.0.2.15 port 54322 ssh2",
+      "decoded_fields": {
+        "user": "root",
+        "src_ip": "192.0.2.15",
+        "src_port": "54322",
+        "app": "sshd",
+        "action": "Accepted"
+      },
+      "ocsf_fields": {
+        "version": "1.9.0",
+        "class_uid": 3001,
+        "class_name": "Authentication (3001)",
+        "actor.user.name": "root",
+        "src_endpoint.ip": "192.0.2.15",
+        "src_endpoint.port": "54322",
+        "fingerprint": "d3d719b176d9afce58926fbd6e94c753e369c20de5b149d33a9778e54e687388",
+        "prev_hash": "genesis"
+      },
+      "raw_ref": "ulpf:raw:0:0:0:94",
+      "raw_sha256": "a3f6d660d88d5f0b7bad67a41bc52977597a62254239169b71a77f715710baef"
+    }
+  },
+  "unknown_vendor_onboarding": {
+    "test_log": "VENDOR-X|9921|CRIT|disk_array_2|temp=88C|status=degrading",
+    "vendor_hint": "vendor_x",
+    "drain_template": "VENDOR-X|<NUM>|CRIT|disk_array_2|temp=88C|status=degrading",
+    "extracted_fields": {
+      "temp": "88C",
+      "status": "degrading"
+    },
+    "field_mappings": {
+      "temp": "custom.vendor_x.temp",
+      "status": "activity_name"
+    },
+    "confidences": {
+      "temp": 0.2914,
+      "status": 0.94
+    },
+    "decisions": {
+      "temp": "CUSTOM_FALLBACK",
+      "status": "AUTO_MAP"
+    },
+    "confidence_thresholds": {
+      "auto_map": ">=0.85",
+      "human_review": "0.60 - 0.85",
+      "custom_fallback": "<0.60"
+    },
+    "matcher_type": "Deterministic/offline 384-dimensional telemetry-aware field matching",
+    "hitl_queue_count": 1,
+    "hitl_approved": true,
+    "approved_item": {
+      "review_id": "rev_vendor_x_01",
+      "cluster_id": 1,
+      "source_key": "client_node",
+      "suggested_target": "src_endpoint.ip",
+      "confidence": 0.87,
+      "inferred_type": "ip",
+      "samples": [
+        "192.0.2.77"
+      ],
+      "template": "VENDOR-X|<NUM>|CRIT|disk_array_2|temp=88C|status=degrading",
+      "status": "APPROVED",
+      "approved_target": "src_endpoint.ip"
+    },
+    "restart_required": false,
+    "raw_vault_locator": "ulpf:raw:0:0:0:57",
+    "processing_time_ms": 18.55
+  },
+  "vector_matcher": {
+    "dataset_size": 30,
+    "top1_accuracy": 86.7,
+    "top3_accuracy": 86.7,
+    "mean_confidence": 0.873,
+    "auto_map_rate": 86.7,
+    "human_review_rate": 0.0,
+    "custom_fallback_rate": 13.3,
+    "records": [
+      {
+        "key": "src_ip",
+        "samples": [
+          "192.0.2.1"
+        ],
+        "expected": "src_endpoint.ip",
+        "predicted": "src_endpoint.ip",
+        "top3": [
+          "src_endpoint.ip",
+          "dst_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "client_ip",
+        "samples": [
+          "192.0.2.2"
+        ],
+        "expected": "src_endpoint.ip",
+        "predicted": "src_endpoint.ip",
+        "top3": [
+          "src_endpoint.ip",
+          "dst_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "saddr",
+        "samples": [
+          "192.0.2.3"
+        ],
+        "expected": "src_endpoint.ip",
+        "predicted": "src_endpoint.ip",
+        "top3": [
+          "src_endpoint.ip",
+          "dst_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "dst_ip",
+        "samples": [
+          "198.51.100.1"
+        ],
+        "expected": "dst_endpoint.ip",
+        "predicted": "dst_endpoint.ip",
+        "top3": [
+          "dst_endpoint.ip",
+          "src_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 0.87,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "target_ip",
+        "samples": [
+          "198.51.100.2"
+        ],
+        "expected": "dst_endpoint.ip",
+        "predicted": "dst_endpoint.ip",
+        "top3": [
+          "dst_endpoint.ip",
+          "src_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 0.87,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "daddr",
+        "samples": [
+          "198.51.100.3"
+        ],
+        "expected": "dst_endpoint.ip",
+        "predicted": "dst_endpoint.ip",
+        "top3": [
+          "dst_endpoint.ip",
+          "src_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "src_port",
+        "samples": [
+          54321
+        ],
+        "expected": "src_endpoint.port",
+        "predicted": "src_endpoint.port",
+        "top3": [
+          "src_endpoint.port",
+          "dst_endpoint.port",
+          "src_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "sport",
+        "samples": [
+          12345
+        ],
+        "expected": "src_endpoint.port",
+        "predicted": "src_endpoint.port",
+        "top3": [
+          "src_endpoint.port",
+          "dst_endpoint.port",
+          "src_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "dst_port",
+        "samples": [
+          443
+        ],
+        "expected": "dst_endpoint.port",
+        "predicted": "dst_endpoint.port",
+        "top3": [
+          "dst_endpoint.port",
+          "src_endpoint.port",
+          "dst_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "dport",
+        "samples": [
+          80
+        ],
+        "expected": "dst_endpoint.port",
+        "predicted": "dst_endpoint.port",
+        "top3": [
+          "dst_endpoint.port",
+          "src_endpoint.port",
+          "src_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "user",
+        "samples": [
+          "admin"
+        ],
+        "expected": "actor.user.name",
+        "predicted": "actor.user.name",
+        "top3": [
+          "actor.user.name",
+          "file.name",
+          "file.hashes.sha256"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "username",
+        "samples": [
+          "root"
+        ],
+        "expected": "actor.user.name",
+        "predicted": "actor.user.name",
+        "top3": [
+          "actor.user.name",
+          "file.name",
+          "device.hostname"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "uname",
+        "samples": [
+          "analyst"
+        ],
+        "expected": "actor.user.name",
+        "predicted": "actor.user.name",
+        "top3": [
+          "actor.user.name",
+          "file.name",
+          "file.hashes.sha256"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "host",
+        "samples": [
+          "server-01"
+        ],
+        "expected": "device.hostname",
+        "predicted": "device.hostname",
+        "top3": [
+          "device.hostname",
+          "dst_endpoint.ip",
+          "actor.user.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "hostname",
+        "samples": [
+          "firewall"
+        ],
+        "expected": "device.hostname",
+        "predicted": "device.hostname",
+        "top3": [
+          "device.hostname",
+          "actor.user.name",
+          "file.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "action",
+        "samples": [
+          "ALLOW"
+        ],
+        "expected": "activity_name",
+        "predicted": "activity_name",
+        "top3": [
+          "activity_name",
+          "actor.user.name",
+          "file.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "status",
+        "samples": [
+          "success"
+        ],
+        "expected": "activity_name",
+        "predicted": "activity_name",
+        "top3": [
+          "activity_name",
+          "actor.user.name",
+          "file.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "severity",
+        "samples": [
+          "high"
+        ],
+        "expected": "severity_id",
+        "predicted": "severity_id",
+        "top3": [
+          "severity_id",
+          "actor.user.name",
+          "file.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "level",
+        "samples": [
+          "error"
+        ],
+        "expected": "severity_id",
+        "predicted": "severity_id",
+        "top3": [
+          "severity_id",
+          "actor.user.name",
+          "file.name"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "url",
+        "samples": [
+          "https://example.com/api"
+        ],
+        "expected": "http_request.url",
+        "predicted": "http_request.url",
+        "top3": [
+          "http_request.url",
+          "severity_id",
+          "src_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "method",
+        "samples": [
+          "POST"
+        ],
+        "expected": "http_request.http_method",
+        "predicted": "http_request.http_method",
+        "top3": [
+          "http_request.http_method",
+          "actor.user.name",
+          "message"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "time",
+        "samples": [
+          "2026-09-28T12:00:00Z"
+        ],
+        "expected": "time",
+        "predicted": "time",
+        "top3": [
+          "time",
+          "file.hashes.sha256",
+          "actor.user.name"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "file_name",
+        "samples": [
+          "cmd.exe"
+        ],
+        "expected": "file.name",
+        "predicted": "file.name",
+        "top3": [
+          "file.name",
+          "actor.user.name",
+          "device.hostname"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "sha256",
+        "samples": [
+          "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        ],
+        "expected": "file.hashes.sha256",
+        "predicted": "file.hashes.sha256",
+        "top3": [
+          "file.hashes.sha256",
+          "message",
+          "severity_id"
+        ],
+        "confidence": 0.94,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "mac",
+        "samples": [
+          "00:1a:2b:3c:4d:5e"
+        ],
+        "expected": "network_endpoint.mac",
+        "predicted": "network_endpoint.mac",
+        "top3": [
+          "network_endpoint.mac",
+          "src_endpoint.ip",
+          "dst_endpoint.ip"
+        ],
+        "confidence": 1.0,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "client_node",
+        "samples": [
+          "192.0.2.77"
+        ],
+        "expected": "src_endpoint.ip",
+        "predicted": "src_endpoint.ip",
+        "top3": [
+          "src_endpoint.ip",
+          "dst_endpoint.ip",
+          "src_endpoint.port"
+        ],
+        "confidence": 0.87,
+        "decision": "AUTO_MAP",
+        "top1_match": true
+      },
+      {
+        "key": "temp",
+        "samples": [
+          "88C"
+        ],
+        "expected": "custom.generic.temp",
+        "predicted": "custom.unknown.temp",
+        "top3": [
+          "actor.user.name",
+          "file.name",
+          "dst_endpoint.ip"
+        ],
+        "confidence": 0.3743,
+        "decision": "CUSTOM_FALLBACK",
+        "top1_match": false
+      },
+      {
+        "key": "fan_speed",
+        "samples": [
+          "4200RPM"
+        ],
+        "expected": "custom.generic.fan_speed",
+        "predicted": "custom.unknown.fan_speed",
+        "top3": [
+          "actor.user.name",
+          "file.name",
+          "dst_endpoint.ip"
+        ],
+        "confidence": 0.3246,
+        "decision": "CUSTOM_FALLBACK",
+        "top1_match": false
+      },
+      {
+        "key": "voltage",
+        "samples": [
+          "3.3V"
+        ],
+        "expected": "custom.generic.voltage",
+        "predicted": "custom.unknown.voltage",
+        "top3": [
+          "actor.user.name",
+          "src_endpoint.ip",
+          "file.hashes.sha256"
+        ],
+        "confidence": 0.3142,
+        "decision": "CUSTOM_FALLBACK",
+        "top1_match": false
+      },
+      {
+        "key": "disk_array",
+        "samples": [
+          "array_01"
+        ],
+        "expected": "custom.generic.disk_array",
+        "predicted": "custom.unknown.disk_array",
+        "top3": [
+          "actor.user.name",
+          "activity_name",
+          "file.name"
+        ],
+        "confidence": 0.2873,
+        "decision": "CUSTOM_FALLBACK",
+        "top1_match": false
+      }
+    ]
+  },
+  "cryptographic_integrity": {
+    "events": 2000,
+    "chain_valid": true,
+    "chain_message": "Cryptographic chain verified across 2000 events without tamper",
+    "chain_verified_events": 2000,
+    "chain_verification_rate": 90330.0,
+    "chain_verification_ms": 22.14,
+    "merkle_root": "2f03d67fc8911bf92549d972badf2555adcda30e44465ba6ec6a83e839104351",
+    "merkle_proof_valid": true,
+    "merkle_proof_hashes": 11,
+    "merkle_proof_latency_ms": 4.46,
+    "checkpoint_valid": true,
+    "signature_valid": true,
+    "checkpoint": {
+      "checkpoint_seq": 2000,
+      "chain_head": "dc6bf77e79b89789ac5c46581b6cbed941035502a12ae8f7dd4cb40e64c6c6b5",
+      "merkle_root": "2f03d67fc8911bf92549d972badf2555adcda30e44465ba6ec6a83e839104351",
+      "signature": "a5f1a16532f95820350c17a5d6131ebb27dbdd75cf93034c9779d69fe0449ffd48b2f52dddd2d08c23dec625d7b1d21a0e5d8fec41930f83a36b0e9b71218f01",
+      "signer_pubkey": "7fa6bfbd450165bd20489ae13431bf8b11703bc61dc237e32edf942a8a404897",
+      "algorithm": "Ed25519"
+    }
+  },
+  "tamper_detection": {
+    "events_tested": 100,
+    "before_valid": true,
+    "tamper_seq": 42,
+    "field_tampered": "src_endpoint.ip",
+    "original_value": "192.0.2.42",
+    "tampered_value": "198.51.100.99",
+    "after_valid": false,
+    "detected_broken_seq": 42,
+    "detection_message": "Tamper detected at seq=42: recalculated fingerprint 'ced9218aa478d6c24371098ec815ad2105d39bbf72acbc8281de9c76a48264c3' does not match stored fingerprint 'dca8e5703b8644b41fb2d528e0690db9846ad1253ac6a9163ade07bb53923be4'",
+    "tamper_detected": true,
+    "deletion_tamper_detected": true
+  },
+  "merkle_proof": {
+    "tree_size": 1000,
+    "merkle_root": "76a730dcb4702f40a7b2f67bf402953d3bf1b315b0693c296fe54c4b976845df",
+    "proof_length": 10,
+    "verified": true,
+    "generation_ms": 0.014,
+    "verification_ms": 0.023,
+    "scales": [
+      {
+        "tree_size": 10,
+        "target_index": 5,
+        "merkle_root": "08663251ba324171182aa8fd9baa5d6820446225cb19b5791a8167526e596e57",
+        "proof_length": 4,
+        "theoretical_length": 4,
+        "generation_ms": 0.008,
+        "verification_ms": 0.013,
+        "verified": true
+      },
+      {
+        "tree_size": 100,
+        "target_index": 50,
+        "merkle_root": "76e01837d38d832ef4dba562bb22e3e95603476033bce85b54868713690ec2be",
+        "proof_length": 7,
+        "theoretical_length": 7,
+        "generation_ms": 0.01,
+        "verification_ms": 0.019,
+        "verified": true
+      },
+      {
+        "tree_size": 1000,
+        "target_index": 500,
+        "merkle_root": "76a730dcb4702f40a7b2f67bf402953d3bf1b315b0693c296fe54c4b976845df",
+        "proof_length": 10,
+        "theoretical_length": 10,
+        "generation_ms": 0.014,
+        "verification_ms": 0.023,
+        "verified": true
+      },
+      {
+        "tree_size": 5000,
+        "target_index": 2500,
+        "merkle_root": "22cc440e74df8ec1159e20288a6ab0634533c9a2b9d20affdb9f8a7c88efac51",
+        "proof_length": 13,
+        "theoretical_length": 13,
+        "generation_ms": 0.02,
+        "verification_ms": 0.034,
+        "verified": true
+      }
+    ]
+  },
+  "crash_recovery": {
+    "events_written": 1500,
+    "events_recovered": 1500,
+    "events_lost": 0,
+    "sha256_matches": 1500,
+    "reconstructed_blocks": 1,
+    "recovery_time_sec": 0.004,
+    "recovery_success": true
+  },
+  "airgap_validation": {
+    "external_http_connections": 0,
+    "external_https_connections": 0,
+    "external_api_calls": 0,
+    "external_dependency_downloads": 0,
+    "socket_leaks": 0,
+    "intercepted_calls": [],
+    "status": "PASS"
+  },
+  "performance_benchmark": {
+    "runs": [
+      {
+        "events": 1000,
+        "raw_bytes": 167125,
+        "compressed_bytes": 877,
+        "compression_ratio": 190.56,
+        "ingestion_elapsed_sec": 0.167,
+        "ingestion_eps": 6003.0,
+        "ingestion_mbps": 0.96,
+        "chain_verify_sec": 0.077,
+        "chain_verify_eps": 12985.0,
+        "query_latency_ms": 15.1,
+        "merkle_proof_ms": 7.06,
+        "theoretical_daily_capacity": 518639508.0
+      },
+      {
+        "events": 5000,
+        "raw_bytes": 835625,
+        "compressed_bytes": 1050,
+        "compression_ratio": 795.83,
+        "ingestion_elapsed_sec": 0.745,
+        "ingestion_eps": 6713.0,
+        "ingestion_mbps": 1.07,
+        "chain_verify_sec": 0.282,
+        "chain_verify_eps": 17750.0,
+        "query_latency_ms": 74.24,
+        "merkle_proof_ms": 70.81,
+        "theoretical_daily_capacity": 579970478.0
+      },
+      {
+        "events": 15000,
+        "raw_bytes": 2506875,
+        "compressed_bytes": 3136,
+        "compression_ratio": 799.39,
+        "ingestion_elapsed_sec": 1.935,
+        "ingestion_eps": 7750.0,
+        "ingestion_mbps": 1.24,
+        "chain_verify_sec": 0.938,
+        "chain_verify_eps": 15984.0,
+        "query_latency_ms": 247.27,
+        "merkle_proof_ms": 67.75,
+        "theoretical_daily_capacity": 669621959.0
+      },
+      {
+        "events": 30000,
+        "raw_bytes": 5013750,
+        "compressed_bytes": 5445,
+        "compression_ratio": 920.8,
+        "ingestion_elapsed_sec": 4.367,
+        "ingestion_eps": 6870.0,
+        "ingestion_mbps": 1.09,
+        "chain_verify_sec": 1.994,
+        "chain_verify_eps": 15048.0,
+        "query_latency_ms": 59.26,
+        "merkle_proof_ms": 132.52,
+        "theoretical_daily_capacity": 593578280.0
+      }
+    ],
+    "highest_eps_run": {
+      "events": 15000,
+      "raw_bytes": 2506875,
+      "compressed_bytes": 3136,
+      "compression_ratio": 799.39,
+      "ingestion_elapsed_sec": 1.935,
+      "ingestion_eps": 7750.0,
+      "ingestion_mbps": 1.24,
+      "chain_verify_sec": 0.938,
+      "chain_verify_eps": 15984.0,
+      "query_latency_ms": 247.27,
+      "merkle_proof_ms": 67.75,
+      "theoretical_daily_capacity": 669621959.0
+    }
+  },
+  "security_matrix": {
+    "Raw SHA-256 verification": "PASS",
+    "CRC-32 validation": "PASS",
+    "Hash-chain verification": "PASS",
+    "Merkle proof verification": "PASS",
+    "Ed25519 checkpoint verification": "PASS",
+    "Tamper detection": "PASS",
+    "Air-gap test": "PASS",
+    "Crash recovery": "PASS"
+  }
+}

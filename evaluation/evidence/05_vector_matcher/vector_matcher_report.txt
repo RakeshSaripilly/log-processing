@@ -1,0 +1,491 @@
+{
+  "dataset_size": 30,
+  "top1_accuracy": 86.7,
+  "top3_accuracy": 86.7,
+  "mean_confidence": 0.873,
+  "auto_map_rate": 86.7,
+  "human_review_rate": 0.0,
+  "custom_fallback_rate": 13.3,
+  "records": [
+    {
+      "key": "src_ip",
+      "samples": [
+        "192.0.2.1"
+      ],
+      "expected": "src_endpoint.ip",
+      "predicted": "src_endpoint.ip",
+      "top3": [
+        "src_endpoint.ip",
+        "dst_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "client_ip",
+      "samples": [
+        "192.0.2.2"
+      ],
+      "expected": "src_endpoint.ip",
+      "predicted": "src_endpoint.ip",
+      "top3": [
+        "src_endpoint.ip",
+        "dst_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "saddr",
+      "samples": [
+        "192.0.2.3"
+      ],
+      "expected": "src_endpoint.ip",
+      "predicted": "src_endpoint.ip",
+      "top3": [
+        "src_endpoint.ip",
+        "dst_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "dst_ip",
+      "samples": [
+        "198.51.100.1"
+      ],
+      "expected": "dst_endpoint.ip",
+      "predicted": "dst_endpoint.ip",
+      "top3": [
+        "dst_endpoint.ip",
+        "src_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 0.87,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "target_ip",
+      "samples": [
+        "198.51.100.2"
+      ],
+      "expected": "dst_endpoint.ip",
+      "predicted": "dst_endpoint.ip",
+      "top3": [
+        "dst_endpoint.ip",
+        "src_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 0.87,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "daddr",
+      "samples": [
+        "198.51.100.3"
+      ],
+      "expected": "dst_endpoint.ip",
+      "predicted": "dst_endpoint.ip",
+      "top3": [
+        "dst_endpoint.ip",
+        "src_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "src_port",
+      "samples": [
+        54321
+      ],
+      "expected": "src_endpoint.port",
+      "predicted": "src_endpoint.port",
+      "top3": [
+        "src_endpoint.port",
+        "dst_endpoint.port",
+        "src_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "sport",
+      "samples": [
+        12345
+      ],
+      "expected": "src_endpoint.port",
+      "predicted": "src_endpoint.port",
+      "top3": [
+        "src_endpoint.port",
+        "dst_endpoint.port",
+        "src_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "dst_port",
+      "samples": [
+        443
+      ],
+      "expected": "dst_endpoint.port",
+      "predicted": "dst_endpoint.port",
+      "top3": [
+        "dst_endpoint.port",
+        "src_endpoint.port",
+        "dst_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "dport",
+      "samples": [
+        80
+      ],
+      "expected": "dst_endpoint.port",
+      "predicted": "dst_endpoint.port",
+      "top3": [
+        "dst_endpoint.port",
+        "src_endpoint.port",
+        "src_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "user",
+      "samples": [
+        "admin"
+      ],
+      "expected": "actor.user.name",
+      "predicted": "actor.user.name",
+      "top3": [
+        "actor.user.name",
+        "file.name",
+        "file.hashes.sha256"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "username",
+      "samples": [
+        "root"
+      ],
+      "expected": "actor.user.name",
+      "predicted": "actor.user.name",
+      "top3": [
+        "actor.user.name",
+        "file.name",
+        "device.hostname"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "uname",
+      "samples": [
+        "analyst"
+      ],
+      "expected": "actor.user.name",
+      "predicted": "actor.user.name",
+      "top3": [
+        "actor.user.name",
+        "file.name",
+        "file.hashes.sha256"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "host",
+      "samples": [
+        "server-01"
+      ],
+      "expected": "device.hostname",
+      "predicted": "device.hostname",
+      "top3": [
+        "device.hostname",
+        "dst_endpoint.ip",
+        "actor.user.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "hostname",
+      "samples": [
+        "firewall"
+      ],
+      "expected": "device.hostname",
+      "predicted": "device.hostname",
+      "top3": [
+        "device.hostname",
+        "actor.user.name",
+        "file.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "action",
+      "samples": [
+        "ALLOW"
+      ],
+      "expected": "activity_name",
+      "predicted": "activity_name",
+      "top3": [
+        "activity_name",
+        "actor.user.name",
+        "file.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "status",
+      "samples": [
+        "success"
+      ],
+      "expected": "activity_name",
+      "predicted": "activity_name",
+      "top3": [
+        "activity_name",
+        "actor.user.name",
+        "file.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "severity",
+      "samples": [
+        "high"
+      ],
+      "expected": "severity_id",
+      "predicted": "severity_id",
+      "top3": [
+        "severity_id",
+        "actor.user.name",
+        "file.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "level",
+      "samples": [
+        "error"
+      ],
+      "expected": "severity_id",
+      "predicted": "severity_id",
+      "top3": [
+        "severity_id",
+        "actor.user.name",
+        "file.name"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "url",
+      "samples": [
+        "https://example.com/api"
+      ],
+      "expected": "http_request.url",
+      "predicted": "http_request.url",
+      "top3": [
+        "http_request.url",
+        "severity_id",
+        "src_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "method",
+      "samples": [
+        "POST"
+      ],
+      "expected": "http_request.http_method",
+      "predicted": "http_request.http_method",
+      "top3": [
+        "http_request.http_method",
+        "actor.user.name",
+        "message"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "time",
+      "samples": [
+        "2026-09-28T12:00:00Z"
+      ],
+      "expected": "time",
+      "predicted": "time",
+      "top3": [
+        "time",
+        "file.hashes.sha256",
+        "actor.user.name"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "file_name",
+      "samples": [
+        "cmd.exe"
+      ],
+      "expected": "file.name",
+      "predicted": "file.name",
+      "top3": [
+        "file.name",
+        "actor.user.name",
+        "device.hostname"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "sha256",
+      "samples": [
+        "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      ],
+      "expected": "file.hashes.sha256",
+      "predicted": "file.hashes.sha256",
+      "top3": [
+        "file.hashes.sha256",
+        "message",
+        "severity_id"
+      ],
+      "confidence": 0.94,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "mac",
+      "samples": [
+        "00:1a:2b:3c:4d:5e"
+      ],
+      "expected": "network_endpoint.mac",
+      "predicted": "network_endpoint.mac",
+      "top3": [
+        "network_endpoint.mac",
+        "src_endpoint.ip",
+        "dst_endpoint.ip"
+      ],
+      "confidence": 1.0,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "client_node",
+      "samples": [
+        "192.0.2.77"
+      ],
+      "expected": "src_endpoint.ip",
+      "predicted": "src_endpoint.ip",
+      "top3": [
+        "src_endpoint.ip",
+        "dst_endpoint.ip",
+        "src_endpoint.port"
+      ],
+      "confidence": 0.87,
+      "decision": "AUTO_MAP",
+      "top1_match": true
+    },
+    {
+      "key": "temp",
+      "samples": [
+        "88C"
+      ],
+      "expected": "custom.generic.temp",
+      "predicted": "custom.unknown.temp",
+      "top3": [
+        "actor.user.name",
+        "file.name",
+        "dst_endpoint.ip"
+      ],
+      "confidence": 0.3743,
+      "decision": "CUSTOM_FALLBACK",
+      "top1_match": false
+    },
+    {
+      "key": "fan_speed",
+      "samples": [
+        "4200RPM"
+      ],
+      "expected": "custom.generic.fan_speed",
+      "predicted": "custom.unknown.fan_speed",
+      "top3": [
+        "actor.user.name",
+        "file.name",
+        "dst_endpoint.ip"
+      ],
+      "confidence": 0.3246,
+      "decision": "CUSTOM_FALLBACK",
+      "top1_match": false
+    },
+    {
+      "key": "voltage",
+      "samples": [
+        "3.3V"
+      ],
+      "expected": "custom.generic.voltage",
+      "predicted": "custom.unknown.voltage",
+      "top3": [
+        "actor.user.name",
+        "src_endpoint.ip",
+        "file.hashes.sha256"
+      ],
+      "confidence": 0.3142,
+      "decision": "CUSTOM_FALLBACK",
+      "top1_match": false
+    },
+    {
+      "key": "disk_array",
+      "samples": [
+        "array_01"
+      ],
+      "expected": "custom.generic.disk_array",
+      "predicted": "custom.unknown.disk_array",
+      "top3": [
+        "actor.user.name",
+        "activity_name",
+        "file.name"
+      ],
+      "confidence": 0.2873,
+      "decision": "CUSTOM_FALLBACK",
+      "top1_match": false
+    }
+  ]
+}

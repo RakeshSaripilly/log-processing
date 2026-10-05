@@ -1,0 +1,70 @@
+========================================================================
+SIH26156 ULPF - PERFORMANCE BENCHMARK REPORT
+========================================================================
+Multi-Scale Evaluation Runs:
+[
+  {
+    "events": 1000,
+    "raw_bytes": 167125,
+    "compressed_bytes": 877,
+    "compression_ratio": 190.56,
+    "ingestion_elapsed_sec": 0.167,
+    "ingestion_eps": 6003.0,
+    "ingestion_mbps": 0.96,
+    "chain_verify_sec": 0.077,
+    "chain_verify_eps": 12985.0,
+    "query_latency_ms": 15.1,
+    "merkle_proof_ms": 7.06,
+    "theoretical_daily_capacity": 518639508.0
+  },
+  {
+    "events": 5000,
+    "raw_bytes": 835625,
+    "compressed_bytes": 1050,
+    "compression_ratio": 795.83,
+    "ingestion_elapsed_sec": 0.745,
+    "ingestion_eps": 6713.0,
+    "ingestion_mbps": 1.07,
+    "chain_verify_sec": 0.282,
+    "chain_verify_eps": 17750.0,
+    "query_latency_ms": 74.24,
+    "merkle_proof_ms": 70.81,
+    "theoretical_daily_capacity": 579970478.0
+  },
+  {
+    "events": 15000,
+    "raw_bytes": 2506875,
+    "compressed_bytes": 3136,
+    "compression_ratio": 799.39,
+    "ingestion_elapsed_sec": 1.935,
+    "ingestion_eps": 7750.0,
+    "ingestion_mbps": 1.24,
+    "chain_verify_sec": 0.938,
+    "chain_verify_eps": 15984.0,
+    "query_latency_ms": 247.27,
+    "merkle_proof_ms": 67.75,
+    "theoretical_daily_capacity": 669621959.0
+  },
+  {
+    "events": 30000,
+    "raw_bytes": 5013750,
+    "compressed_bytes": 5445,
+    "compression_ratio": 920.8,
+    "ingestion_elapsed_sec": 4.367,
+    "ingestion_eps": 6870.0,
+    "ingestion_mbps": 1.09,
+    "chain_verify_sec": 1.994,
+    "chain_verify_eps": 15048.0,
+    "query_latency_ms": 59.26,
+    "merkle_proof_ms": 132.52,
+    "theoretical_daily_capacity": 593578280.0
+  }
+]
+
+CSV Summary:
+events,eps,mbps,compression_ratio,verify_ms,query_ms,merkle_ms,theoretical_daily_capacity
+1000,6003.0,0.96,190.56,77.00,15.10,7.06,518639508.0
+5000,6713.0,1.07,795.83,282.00,74.24,70.81,579970478.0
+15000,7750.0,1.24,799.39,938.00,247.27,67.75,669621959.0
+30000,6870.0,1.09,920.8,1994.00,59.26,132.52,593578280.0
+========================================================================

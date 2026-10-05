@@ -8,17 +8,18 @@ import time
 import uuid
 import json
 import logging
-from typing import Dict, Any, Optional, List, Tuple
+import threading
+from pathlib import Path
+from typing import Dict, Any, Optional, List, Tuple, Callable
 
 from core.vault import VaultStorage, RawRef
 from core.detector import PackRegistry, CompiledSourcePack
-from core.decoders import DECODER_REGISTRY, decode_json
+from core.decoders import DECODER_REGISTRY, decode_json, decode_keyvalue
 from core.salvage import extract_observables
 from core.drain_service import DrainClusterService
 from core.vector_matcher import TelemetryVectorMatcher
 from core.normalizer import normalize_to_ocsf, build_7stage_lineage
-from core.integrity import compute_fingerprint, jcs_canonicalize
-from core.checkpoint import MerkleTree, KeyManager
+from core.attestation import compute_fingerprint, jcs_canonicalize, MerkleTree, KeyManager
 from storage.sinks import LakeStorageEngine, WazuhForwarder
 
 logger = logging.getLogger("ulpf.pipeline")
@@ -34,9 +35,15 @@ class ProcessingPipeline:
         self,
         vault_dir: str = "./storage/raw",
         lake_dir: str = "./lake",
-        packs_dir: str = "./parsers/active",
+        packs_dir: Optional[str] = None,
         passphrase: Optional[str] = None
     ):
+        if packs_dir is None:
+            packs_path = Path("./parsers/active")
+            if packs_path.exists():
+                packs_dir = str(packs_path)
+            else:
+                packs_dir = str(Path(__file__).resolve().parent.parent / "parsers" / "active")
         self.vault = VaultStorage(vault_dir=vault_dir, passphrase=passphrase)
         self.registry = PackRegistry(packs_dir=packs_dir)
         self.drain = DrainClusterService()
@@ -44,6 +51,7 @@ class ProcessingPipeline:
         self.lake = LakeStorageEngine(lake_dir=lake_dir)
         self.wazuh = WazuhForwarder()
         self.key_manager = KeyManager()
+        self.lock = threading.Lock()
 
         # Chain state
         self.sequence_counter = 0
@@ -78,9 +86,15 @@ class ProcessingPipeline:
             raw_bytes = bytes(raw_input)
             raw_text = raw_bytes.decode('utf-8', errors='replace').strip()
 
-        # STAGE 1: VAULT WRITE-BEFORE-PARSE (Order is correctness property)
-        locator = self.vault.write_raw(raw_bytes)
-        locator_str = locator.to_string()
+        with self.lock:
+            # STAGE 1: VAULT WRITE-BEFORE-PARSE (Order is correctness property)
+            res = self.vault.write_raw(raw_bytes)
+            if isinstance(res, tuple):
+                locator, raw_sha256 = res
+            else:
+                locator = res
+                raw_sha256 = locator.raw_sha256 if hasattr(locator, "raw_sha256") else ""
+            locator_str = locator.to_string()
 
         # STAGE 2: SOURCE PACK DETECTION
         claimed_pack = self.registry.find_matching_pack(raw_text)
@@ -112,10 +126,10 @@ class ProcessingPipeline:
             }
 
             # Attempt JSON/KV parse to uncover field candidates for vector matching
-            json_parsed = decode_json(raw_text)
-            if json_parsed:
-                extracted_data.update(json_parsed)
-                for k, v in json_parsed.items():
+            candidate_parsed = decode_json(raw_text) or decode_keyvalue(raw_text)
+            if candidate_parsed:
+                extracted_data.update(candidate_parsed)
+                for k, v in candidate_parsed.items():
                     vm_res = self.vector_matcher.map_field(k, [v], vendor_hint=vendor_hint)
                     max_vector_conf = min(max_vector_conf, vm_res["confidence"])
                     if vm_res["decision"] == "AUTO_MAP":
@@ -238,3 +252,57 @@ class ProcessingPipeline:
             item["template"], "APPROVED", int(time.time() * 1000)
         ])
         return True
+
+    def process_file(
+        self,
+        file_path: str,
+        vendor_hint: Optional[str] = None,
+        on_progress: Optional[Callable[[int, Dict[str, Any]], None]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Process an entire log file through the 7-stage ULPF pipeline.
+        Reuses process_raw() for each line, ensures vault is flushed,
+        signs checkpoint, and returns all normalized OCSF events.
+        """
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Input file does not exist: {file_path}")
+        if not path.is_file():
+            raise ValueError(f"Input path is not a file: {file_path}")
+
+        events = []
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            for idx, line in enumerate(f):
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                try:
+                    ev = self.process_raw(stripped, vendor_hint=vendor_hint)
+                    events.append(ev)
+                    if on_progress:
+                        on_progress(idx, ev)
+                except Exception as e:
+                    logger.error(f"Error processing line {idx} in {file_path}: {e}")
+
+        # Ensure all buffered logs are permanently written and fsynced
+        self.vault.flush()
+
+        # Sign checkpoint for remaining pending events
+        if self.pending_fingerprints_for_merkle:
+            self._create_checkpoint()
+
+        return events
+
+    def close(self):
+        """Cleanly flush and close lake and vault resources."""
+        try:
+            if hasattr(self, "vault"):
+                self.vault.flush()
+        except Exception:
+            pass
+        try:
+            if hasattr(self, "lake"):
+                self.lake.close()
+        except Exception:
+            pass
+

@@ -1,0 +1,26 @@
+name: Apache Combined Access Log
+vendor: Apache
+product: HTTP Server
+version: "2.4"
+class_uid: 4001
+category_uid: 4
+detection:
+  patterns:
+    - '^\d+\.\d+\.\d+\.\d+\s+-\s+[^\s]+\s+\[\d{2}/[A-Za-z]{3}/\d{4}:\d{2}:\d{2}:\d{2}\s+[+-]\d{4}\]\s+"(GET|POST|PUT|DELETE|HEAD|OPTIONS)'
+decoders:
+  - regex
+regex_pattern: '^(?P<src_ip>\d+\.\d+\.\d+\.\d+)\s+-\s+(?P<username>[^\s]+)\s+\[(?P<timestamp>[^\]]+)\]\s+"(?P<http_method>[A-Z]+)\s+(?P<url>[^\s]+)\s+HTTP/[0-9.]+"\s+(?P<status_code>\d+)\s+(?P<bytes_sent>\d+)'
+mappings:
+  src_ip: src_endpoint.ip
+  username: actor.user.name
+  http_method: http_request.http_method
+  url: http_request.url
+  status_code: status_id
+labels:
+  - web
+  - apache
+  - http
+fixtures:
+  - raw: '192.0.2.77 - frank [26/Sep/2026:14:32:10 +0000] "GET /api/v1/telemetry HTTP/1.1" 200 4520'
+    expected_ip: "192.0.2.77"
+    expected_method: "GET"

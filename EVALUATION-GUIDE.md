@@ -11,17 +11,20 @@
 ```bash
 python -m pytest tests -v
 ```
-**Expected Output:** `28 passed in <4s` (100% pass across Vault, 10 Decoders, Vector Matcher, Attestation, Tamper Detection, Merkle Proofs, ulpf-py, Air-Gap).
+**Expected Output:** `28 passed in ~4s` (100% pass across Vault, 10 Decoders, Vector Matcher, Attestation, Tamper Detection, Merkle Proofs, ulpf-py, Air-Gap).
 
-### Step 2: Run End-to-End Performance Benchmark
+### Step 2: Run Master Reproducible Evaluation Suite
 ```bash
-python benchmarks/run_benchmark.py
+python evaluation/run_evaluation.py
 ```
 **Expected Output:**
-- Vault Compression: **>500x ratio**
-- Chain Verification: **>20,000 checks/sec**
-- DuckDB Predicate Pushdown Query: **<70 ms**
-- Merkle Inclusion Proof: **<20 ms**
+- Lossless Byte Retention: **10,000 / 10,000 SHA-256 matches (100.0%)**
+- Vault Compression: **Measured >800x ratio** on structured batch corpus
+- Chain Verification: **>14,000 checks/sec**
+- DuckDB Predicate Pushdown Query: **<75 ms**
+- RFC 6962 Merkle Inclusion Proof: **10 hashes (<75 ms)**
+- Air-Gap Sockets: **0 External Connections (PASS)**
+- Master Report generated at: `evaluation/MASTER_RESULTS.md` and `evaluation/ppt_metrics.json`
 
 ### Step 3: Launch Live Interactive Control Console
 ```bash

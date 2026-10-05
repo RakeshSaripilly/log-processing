@@ -243,11 +243,11 @@ lineage = client.get_lineage(event_id=df.iloc[0]["event_id"])
 print(lineage["stage_1_raw"]["locator"])
 print(lineage["stage_6_attestation"]["fingerprint"])
 
-# 7. Verify Blockchain Hash Chain
+# 7. Verify Continuous Hash Chain (RFC 8785 JCS + BLAKE3)
 is_valid, msg, broken_seq = client.verify_chain(start_seq=0, end_seq=1000)
 print(f"Chain Integrity: {is_valid} ({msg})")
 
-# 8. Generate RFC 6962 Merkle Inclusion Proof (Zero-Knowledge)
+# 8. Generate RFC 6962 Merkle Inclusion Proof
 proof = client.prove(event_seq=0)
 print(f"Merkle Root: {proof['merkle_root']}, Verified: {proof['verified']}")
 

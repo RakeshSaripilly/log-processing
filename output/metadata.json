@@ -1,0 +1,22 @@
+{
+  "input_file": "samples/firewall.log",
+  "file_size_bytes": 656,
+  "file_size_human": "656 B",
+  "format": "CEF",
+  "source": "Firewall",
+  "mode": "Offline / Air-Gapped",
+  "events_read": 5,
+  "events_parsed": 5,
+  "events_normalized": 5,
+  "events_rejected": 0,
+  "raw_preserved": true,
+  "traceability_verified": true,
+  "integrity_verified": true,
+  "processing_time_seconds": 0.5,
+  "throughput_events_per_second": 9,
+  "outputs": {
+    "normalized": "output/normalized.json",
+    "raw": "output/raw/",
+    "metadata": "output/metadata.json"
+  }
+}

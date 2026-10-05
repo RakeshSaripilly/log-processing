@@ -1,0 +1,4 @@
+{"timestamp":"2026-09-26T12:00:00.123456+0000","event_type":"alert","src_ip":"192.0.2.14","src_port":53211,"dest_ip":"198.51.100.4","dest_port":80,"proto":"TCP","alert":{"action":"allowed","signature":"ET SCAN Potential SSH Scan"}}
+{"timestamp":"2026-09-26T12:00:02.789123+0000","event_type":"flow","src_ip":"198.51.100.99","src_port":443,"dest_ip":"203.0.113.12","dest_port":52110,"proto":"TCP","app_proto":"tls"}
+{"timestamp":"2026-09-26T12:00:05.456789+0000","event_type":"dns","src_ip":"192.0.2.55","src_port":49152,"dest_ip":"198.51.100.25","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"api.internal.corp"}}
+{"timestamp":"2026-09-26T12:00:08.112233+0000","event_type":"alert","src_ip":"203.0.113.19","src_port":60123,"dest_ip":"198.51.100.5","dest_port":443,"proto":"TCP","alert":{"action":"blocked","signature":"ET ATTACK Malicious SSL Certificate Detected"}}

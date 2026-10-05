@@ -15,7 +15,7 @@
 | **d** | **Lossless Traceability** | 7-Stage lineage tracking (Raw -> Detection -> Extraction -> Inference -> Normalization -> Attestation -> Sink) | `python -c "from ulpf_py import ULPFClient; print(ULPFClient().get_lineage('...'))"` |
 | **e** | **Plug-and-Play Vendor Onboarding** | Declarative YAML Source Packs in `parsers/active/` with 400ms debounced hot-reload; zero service restarts | `ls parsers/active/` |
 | **f** | **Unified Visibility & Dashboard** | Glassmorphic React/HTML5 SOC console with live pipeline visualizer, Lake SQL, Tamper Lab, and Merkle proof generator | View `http://localhost:8000` |
-| **g** | **Handle High Throughput (Billions/Day)** | Multi-threaded pipeline, memory-bounded batch streaming, DuckDB partitioned lake, zstd compression (>500x ratio) | `python benchmarks/run_benchmark.py` |
+| **g** | **Handle High Throughput (Billion-Scale Architecture)** | Multi-threaded pipeline, memory-bounded batch streaming, DuckDB partitioned lake, zstd compression (measured >800x ratio) | `python evaluation/run_evaluation.py` |
 | **h** | **SIEM, Data Lake & ML Ready** | `ulpf-py` Python SDK (`to_pandas()`, `to_arrow()`, `to_spark()`, `to_features()`), Wazuh UDP side-by-side forwarder | `python -m pytest tests/test_ulpf_py.py -v` |
 | **i** | **Reduced Parser Development Effort** | Telemetry-Aware Vector Matcher (`key | samples | type` + FAISS/Cosine) + Drain3 template clustering + HITL queue | `python -m pytest tests/test_vector_matcher.py -v` |
 | **j** | **Air-Gapped & Offline Execution** | 100% offline model embeddings, zero external API dependencies, wheel packaging, zero socket leaks | `python -m pytest tests/test_airgap.py -v` |
@@ -28,4 +28,4 @@
 2. **Offline Python SDK Wheel**: Built in `dist/` and editable installed as `ulpf-py-1.0.0-py3-none-any.whl`.
 3. **Automated Verification Suite**: 28 tests passing 100% in `python -m pytest tests -v`.
 4. **SIH Evaluation Guide**: `EVALUATION-GUIDE.md` detailing architecture advantages and 6 verification challenges.
-5. **SIH 6-Slide Presentation**: `PRESENTATION.md` matching the official SIH evaluation slide deck template.
+5. **SIH 5-Slide Technical Presentation**: `PRESENTATION.md` and `SIH26156_ULPF_Presentation_V2.pptx` matching the official SIH technical presentation template.

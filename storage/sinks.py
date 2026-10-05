@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 import duckdb
+import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
@@ -226,9 +227,14 @@ class LakeStorageEngine:
         with open(ndjson_file, "a", encoding="utf-8") as f:
             f.write("\n".join(ndjson_lines) + "\n")
 
-        self.con.executemany("""
-            INSERT OR REPLACE INTO parsed_logs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, rows)
+        cols = [
+            "event_id", "sequence", "timestamp", "class_uid", "category_uid",
+            "vendor", "product", "activity_name", "src_ip", "src_port",
+            "dst_ip", "dst_port", "user_name", "hostname", "fingerprint",
+            "prev_hash", "raw_locator", "raw_payload", "ocsf_json"
+        ]
+        df = pd.DataFrame(rows, columns=cols)
+        self.con.append("parsed_logs", df)
 
     def flush_parquet(self):
         """
